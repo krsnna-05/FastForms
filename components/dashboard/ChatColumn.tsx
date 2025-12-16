@@ -77,7 +77,7 @@ const PromptInputContainer = ({
   const [text, setText] = useState("");
 
   return (
-    <div className="w-full shrink-0">
+    <div className="w-full shrink-0  rounded-lg border border-border/60 fixed bottom-5 bg-background container max-w-6xl">
       <PromptInput onSubmit={handleSubmit}>
         <PromptInputHeader>
           <PromptInputAttachments>
@@ -111,7 +111,7 @@ const ConversationContainer = ({ messages }: { messages: UIMessage[] }) => {
   console.log("Messages in ChatColumn:", messages.length);
 
   return (
-    <Conversation className="conversation-scroll w-full max-h-[612px] overflow-y-auto overflow-x-hidden min-h-0">
+    <Conversation className="conversation-scroll w-full max-h-[500px] md:max-h-[570px] overflow-y-auto overflow-x-hidden min-h-0">
       <ConversationContent>
         {messages.length === 0 ? (
           <ConversationEmptyState

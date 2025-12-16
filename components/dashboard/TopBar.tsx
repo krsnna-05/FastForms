@@ -22,26 +22,14 @@ const TopBar = ({
 
           {/* Form Name - Editable */}
           <div className="flex items-center gap-2">
-            {isEditingName ? (
-              <input
-                type="text"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
-                onKeyDown={(e) => e.key === "Enter" && setIsEditingName(false)}
-                className="px-2 py-1 bg-input border border-primary/30 rounded-md text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 flex-1 max-w-xs"
-                autoFocus
-              />
-            ) : (
-              <button
-                onClick={() => setIsEditingName(true)}
-                className="px-2 py-1 text-sm font-semibold text-foreground hover:bg-card/50 rounded-md transition-colors truncate flex-1 text-left"
-                title="Click to edit form name"
-              >
-                {formName}
-              </button>
-            )}
-            <span className="text-xs text-muted-foreground/60 hidden sm:inline whitespace-nowrap">
+            <p
+              className="px-2 py-1 text-sm font-semibold text-foreground hover:bg-card/50 rounded-md transition-colors truncate flex-1 text-left"
+              title="Click to edit form name"
+            >
+              {formName}
+            </p>
+
+            <span className="text-xs text-muted-foreground/60 whitespace-nowrap">
               • Last edited 2 min ago
             </span>
           </div>
