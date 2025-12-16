@@ -13,7 +13,7 @@ const TopBar = ({
   const [isEditingName, setIsEditingName] = useState(false);
 
   return (
-    <div className=" border-b border-muted-foreground/50 backdrop-blur-sm bg-background h-14 flex items-center">
+    <div className=" border-b border-muted-foreground/50 backdrop-blur-sm bg-background h-14 flex items-center px-3">
       {/* Top section */}
       <div className="py-3 flex items-center gap-4 flex-1">
         {/* Left - Sidebar trigger & Form name */}
