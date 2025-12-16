@@ -1,10 +1,8 @@
 import FormBuilder from "@/components/dashboard/FormBuilder";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import React from "react";
 
 const page = () => {
   return (
-    <div className=" pt-18 w-full flex ">
+    <div className=" pt-18 w-full flex flex-1 ">
       <FormBuilder />
     </div>
   );
