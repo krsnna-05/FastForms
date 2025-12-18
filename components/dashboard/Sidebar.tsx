@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Plus, Search, Settings } from "lucide-react";
+import { Inbox, Plus } from "lucide-react";
 
 import {
   Sidebar,
@@ -12,35 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-];
+import Link from "next/link";
 
 export function AppSidebar() {
   return (
@@ -50,11 +22,13 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Button variant={"default"}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Form
-                  </Button>
+                <SidebarMenuButton asChild className="">
+                  <Link href="/dashboard" className="">
+                    <Button variant={"default"} className="w-full">
+                      <Plus className="mr-2 h-4 w-4" />
+                      New Form
+                    </Button>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -63,8 +37,45 @@ export function AppSidebar() {
         <Separator className="my-1 bg-muted-foreground" />
         <SidebarGroup>
           <SidebarGroupLabel>Your Forms</SidebarGroupLabel>
+          <UserForms />
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
 }
+
+const UserForms = () => {
+  const forms = [
+    { id: "1", title: "Customer Feedback" },
+    { id: "2", title: "Event Registration" },
+    { id: "3", title: "Survey Form" },
+  ];
+
+  return (
+    <SidebarMenu>
+      {forms.map((form) => (
+        <UserForm key={form.id} id={form.id} title={form.title} />
+      ))}
+    </SidebarMenu>
+  );
+};
+
+type UserFormProps = {
+  id: string;
+  title: string;
+};
+
+const UserForm = ({ id, title }: UserFormProps) => {
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild>
+        <Link href={`/forms/${id}`}>
+          <Button variant="ghost" className="w-full justify-start">
+            <Inbox className="mr-2 h-4 w-4" />
+            {title}
+          </Button>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};

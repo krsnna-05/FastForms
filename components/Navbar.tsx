@@ -1,6 +1,7 @@
 "use client";
 
 import { Menu, FormIcon } from "lucide-react";
+import Link from "next/link";
 
 import {
   Accordion,
@@ -9,6 +10,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -54,15 +61,25 @@ interface NavbarProps {
 
 const AvatarName = ({ url, name }: { url: string; name: string }) => {
   return (
-    <div className=" flex items-center gap-2">
-      <Avatar className="cursor-pointer">
-        <AvatarImage src={url} alt={name} />
-        <AvatarFallback className="bg-primary text-white font-semibold">
-          {name.charAt(0).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <p>{name}</p>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <div className="flex items-center gap-2 cursor-pointer">
+          <Avatar>
+            <AvatarImage src={url} alt={name} />
+            <AvatarFallback className="bg-primary text-white font-semibold">
+              {name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <p>{name}</p>
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard">Dashboard</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>Logout</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
