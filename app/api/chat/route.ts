@@ -8,6 +8,7 @@ const askQuestion = async (prompt: string) => {
       model: ollama("ministral-3:3b"),
       prompt: prompt,
       temperature: 0.8,
+      system: "You are a helpful assistant. who always answers in english.",
     });
 
     return result.toUIMessageStreamResponse();
@@ -20,7 +21,7 @@ const askQuestion = async (prompt: string) => {
   }
 };
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
