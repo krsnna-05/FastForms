@@ -17,6 +17,27 @@ import {
   PromptInputTools,
 } from "../ai-elements/prompt-input";
 
+import { google } from "googleapis";
+
+const forms = google.forms("v1");
+
+forms.forms.create(
+  {
+    requestBody: {
+      info: {
+        title: "Sample Form",
+      },
+    },
+  },
+  (err, res) => {
+    if (err) {
+      console.error("Error creating form:", err);
+      return;
+    }
+    console.log("Form created:", res?.data);
+  }
+);
+
 import { SidebarTrigger } from "../ui/sidebar";
 import { Check, Clipboard, Lightbulb, Pencil, Star } from "lucide-react";
 

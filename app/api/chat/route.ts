@@ -1,11 +1,6 @@
 import type { NextRequest, NextResponse } from "next/server";
 import { ollama } from "ai-sdk-ollama";
-import {
-  convertToModelMessages,
-  ModelMessage,
-  streamText,
-  UIMessage,
-} from "ai";
+import { convertToModelMessages, streamText, UIMessage } from "ai";
 
 const askQuestion = async (prompt: UIMessage[]) => {
   try {
