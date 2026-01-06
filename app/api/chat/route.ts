@@ -1,12 +1,17 @@
 import type { NextRequest, NextResponse } from "next/server";
 import { ollama } from "ai-sdk-ollama";
-import { streamText } from "ai";
+import {
+  convertToModelMessages,
+  ModelMessage,
+  streamText,
+  UIMessage,
+} from "ai";
 
-const askQuestion = async (prompt: string) => {
+const askQuestion = async (prompt: UIMessage[]) => {
   try {
     const result = streamText({
       model: ollama("ministral-3:3b"),
-      prompt: prompt,
+      prompt: await convertToModelMessages(prompt),
       temperature: 0.8,
       system: "You are a helpful assistant. who always answers in english.",
     });
@@ -23,9 +28,9 @@ const askQuestion = async (prompt: string) => {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const { messages }: { messages: UIMessage[] } = await req.json();
 
-    if (!body || !body.prompt) {
+    if (!messages) {
       return new Response(
         JSON.stringify({ error: "No prompt provided in the request body" }),
         {
@@ -35,7 +40,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const prompt = body.prompt || "Who are you ?";
+    const prompt = messages || "Who are you ?";
 
     return await askQuestion(prompt);
   } catch (error) {

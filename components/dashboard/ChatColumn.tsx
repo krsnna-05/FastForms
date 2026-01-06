@@ -9,7 +9,7 @@ import {
   ConversationScrollButton,
 } from "../ai-elements/conversation";
 
-import { useChat } from "@ai-sdk/react";
+import { CreateUIMessage, useChat } from "@ai-sdk/react";
 
 import {
   Message,
@@ -38,12 +38,15 @@ import {
 import type { ChatStatus } from "ai";
 
 const ChatColumn = () => {
-  const { setMessages, messages, status } = useChat();
+  const { setMessages, messages, status, sendMessage } = useChat();
 
   return (
     <div className="flex flex-col container max-w-6xl mx-auto h-full min-h-0 overflow-hidden p-4">
       <ConversationContainer messages={messages} />
-      <PromptInputContainer setMessage={setMessages} />
+      <PromptInputContainer
+        setMessage={setMessages}
+        sendMessage={sendMessage}
+      />
     </div>
   );
 };
@@ -53,25 +56,35 @@ export default ChatColumn;
 const PromptInputContainer = ({
   setMessage,
   status,
+  sendMessage,
 }: {
   setMessage?: (
     message: UIMessage[] | ((prev: UIMessage[]) => UIMessage[])
   ) => void;
   status?: ChatStatus;
+  sendMessage?: (message: PromptInputMessage) => Promise<void>;
 }) => {
   const handleSubmit = (message: PromptInputMessage) => {
     if (!message || !setMessage) return;
 
     console.log("Submitting message:", message, typeof message);
 
-    setMessage((prevMessages: UIMessage[]) => [
-      ...prevMessages,
-      {
-        id: String(Date.now()),
-        role: "user",
-        parts: [{ type: "text", text: message.text, files: message.files }],
-      },
-    ]);
+    sendMessage &&
+      sendMessage({
+        text: message.text,
+        files: message.files,
+      });
+
+    setText("");
+
+    // setMessage((prevMessages: UIMessage[]) => [
+    //   ...prevMessages,
+    //   {
+    //     id: String(Date.now()),
+    //     role: "user",
+    //     parts: [{ type: "text", text: message.text, files: message.files }],
+    //   },
+    // ]);
   };
 
   const [text, setText] = useState("");
