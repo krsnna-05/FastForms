@@ -10,5 +10,5 @@ export const oauth2Client = new google.auth.OAuth2(
 export const googleAuthScopes = [
   "https://www.googleapis.com/auth/userinfo.profile",
   "https://www.googleapis.com/auth/userinfo.email",
-  "https://www.googleapis.com/auth/forms",
+  "https://www.googleapis.com/auth/forms.body",
 ];
