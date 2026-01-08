@@ -1,10 +1,6 @@
 import { create } from "zustand";
 
-type UserDataType = {
-  name: string;
-  email: string;
-  profilePhotoUrl?: string;
-};
+2;
 
 type AuthState = {
   isAuthenticated: boolean;

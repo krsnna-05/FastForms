@@ -100,6 +100,8 @@ export async function POST(req: Request) {
         refreshToken: res.tokens.refresh_token || "",
         accessToken: res.tokens.access_token || "",
       });
+
+      console.log("Existing user updated with new tokens for ID:", userId);
     }
 
     return NextResponse.json(

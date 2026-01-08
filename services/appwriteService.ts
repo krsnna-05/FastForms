@@ -55,6 +55,23 @@ class AppwriteService {
       console.log("Error updating user:", error);
     }
   }
+
+  async getUserById(userId: string) {
+    try {
+      console.log("Fetching user with ID:", userId);
+      const res = await tablesDB.getRow({
+        databaseId: this.dbId,
+        tableId: this.userTableId,
+        rowId: userId,
+      });
+
+      console.log("User fetched successfully:", res);
+      return res;
+    } catch (error) {
+      console.log("Error fetching user by ID:", error);
+      return null;
+    }
+  }
 }
 
 export default new AppwriteService();
