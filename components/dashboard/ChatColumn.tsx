@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import type { UIMessage } from "ai";
+import { useEffect, useState } from "react";
+import type { UIMessage } from "@ai-sdk/react";
 import {
   Conversation,
   ConversationContent,
@@ -39,6 +39,26 @@ import type { ChatStatus } from "ai";
 
 const ChatColumn = () => {
   const { setMessages, messages, status, sendMessage } = useChat();
+
+  useEffect(() => {
+    const prompt = localStorage.getItem("create-form-prompt");
+
+    if (prompt) {
+      localStorage.removeItem("create-form-prompt");
+
+      const userMessage: UIMessage = {
+        id: String(Date.now()),
+        role: "user",
+        parts: [{ type: "text", text: prompt }],
+      };
+
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
+    }
+
+    sendMessage && sendMessage(messages[messages.length - 1], {
+      
+    });
+  }, [setMessages]);
 
   return (
     <div className="flex flex-col container max-w-6xl mx-auto h-full min-h-0 overflow-hidden p-4">

@@ -17,16 +17,24 @@ import {
   PromptInputTools,
 } from "../ai-elements/prompt-input";
 
+import { useRouter } from "next/navigation";
+
 import { SidebarTrigger } from "../ui/sidebar";
 import { Check, Clipboard, Lightbulb, Pencil, Star } from "lucide-react";
 
 const PromptInputCom = () => {
+  const router = useRouter();
+
   const handleSubmit = (
     message: PromptInputMessage,
     event: FormEvent<HTMLFormElement>
   ) => {
     localStorage.setItem("create-form-prompt", message.text);
     setText("");
+
+    const formId = crypto.randomUUID();
+
+    router.push(`/forms/${formId}?create=true`);
   };
 
   const [text, setText] = useState("");
