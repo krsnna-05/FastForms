@@ -5,8 +5,6 @@ const getGoogleFormsProvider = (access_token: string) => {
     access_token: access_token,
   };
 
-  console.log("credentials in getGoogleFormsProvider:", credentials);
-
   const auth = new google.auth.OAuth2();
   auth.setCredentials(credentials);
 

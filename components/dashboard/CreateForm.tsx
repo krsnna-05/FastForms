@@ -25,7 +25,8 @@ const PromptInputCom = () => {
     message: PromptInputMessage,
     event: FormEvent<HTMLFormElement>
   ) => {
-    console.log("Prompt submitted:", message);
+    localStorage.setItem("create-form-prompt", message.text);
+    setText("");
   };
 
   const [text, setText] = useState("");

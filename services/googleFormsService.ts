@@ -22,15 +22,9 @@ class googleFormsService {
       throw new Error("User not found or missing access token");
     }
 
-    console.log("User found. Attempting to fetch form with access token");
-
-    // Use the access token directly without refresh
-    // This ensures we use the exact token the user granted scopes for
     try {
       this.forms = getGoogleFormsProvider(user.accessToken as string);
-      console.log("Google Forms API initialized successfully");
     } catch (error) {
-      console.log("Error initializing Google Forms API:", error);
       throw new Error("Failed to initialize Google Forms API");
     }
   }
