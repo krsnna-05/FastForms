@@ -1,29 +1,58 @@
 import type { NextRequest, NextResponse } from "next/server";
-import { ollama } from "ai-sdk-ollama";
-import { convertToModelMessages, streamText, UIMessage } from "ai";
+import { generateText, ollama } from "ai-sdk-ollama";
+import { convertToModelMessages, Output, streamText, UIMessage } from "ai";
+import systemPrompt from "@/systemPrompt.json";
+import z from "zod";
 
-const askQuestion = async (prompt: UIMessage[]) => {
-  try {
-    const result = streamText({
-      model: ollama("ministral-3:3b"),
-      prompt: await convertToModelMessages(prompt),
-      temperature: 0.8,
-      system: "You are a helpful assistant. who always answers in english.",
-    });
-
-    return result.toUIMessageStreamResponse();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
+const askQuestion = async (
+  prompt: UIMessage[],
+  promptType: "create" | "update"
+) => {
+  if (promptType !== "create") {
+    return new Response(JSON.stringify({ error: "Unsupported prompt type" }), {
+      status: 400,
     });
   }
+
+  const schema = z.object({
+    message: z.string().describe("A brief message confirming form creation"),
+    formTitle: z.string(),
+    form: z.array(
+      z.object({
+        type: z.enum([
+          "short_text",
+          "long_text",
+          "multiple_choice",
+          "checkboxes",
+        ]),
+        question: z.string(),
+        required: z.boolean(),
+        options: z.array(z.string()).optional(),
+      })
+    ),
+  });
+
+  const output = await generateText({
+    model: ollama("ministral-3:3b"),
+    output: Output.object({ schema }),
+    messages: prompt,
+    system:
+      "You are a backend service. Convert the user instruction into a JSON object that strictly follows the given schema. Return ONLY valid JSON. Do not ask questions. Do not explain. Do not include markdown or extra text.",
+  });
+
+  return new Response(JSON.stringify(JSON.parse(output.text), null, 2), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 };
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages }: { messages: UIMessage[] } = await req.json();
+    const {
+      messages,
+      promptType,
+    }: { messages: UIMessage[]; promptType: "create" | "update" } =
+      await req.json();
 
     if (!messages) {
       return new Response(
@@ -37,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     const prompt = messages || "Who are you ?";
 
-    return await askQuestion(prompt);
+    return await askQuestion(prompt, promptType);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return new Response(JSON.stringify({ error: message }), {

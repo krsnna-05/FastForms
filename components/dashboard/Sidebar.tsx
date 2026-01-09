@@ -1,3 +1,5 @@
+"use client";
+
 import { Inbox, Plus } from "lucide-react";
 
 import {
@@ -13,6 +15,7 @@ import {
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import Link from "next/link";
+import useFormStore from "@/store/FormStore";
 
 export function AppSidebar() {
   return (
@@ -45,11 +48,7 @@ export function AppSidebar() {
 }
 
 const UserForms = () => {
-  const forms = [
-    { id: "1", title: "Customer Feedback" },
-    { id: "2", title: "Event Registration" },
-    { id: "3", title: "Survey Form" },
-  ];
+  const { forms } = useFormStore();
 
   return (
     <SidebarMenu>

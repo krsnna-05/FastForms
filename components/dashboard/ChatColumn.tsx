@@ -9,7 +9,7 @@ import {
   ConversationScrollButton,
 } from "../ai-elements/conversation";
 
-import { CreateUIMessage, useChat } from "@ai-sdk/react";
+import { useChat } from "@ai-sdk/react";
 
 import {
   Message,
@@ -35,30 +35,35 @@ import {
   PromptInputTools,
 } from "../ai-elements/prompt-input";
 
-import type { ChatStatus } from "ai";
+import { type ChatStatus } from "ai";
 
 const ChatColumn = () => {
   const { setMessages, messages, status, sendMessage } = useChat();
 
   useEffect(() => {
-    const prompt = localStorage.getItem("create-form-prompt");
+    const loadPrompt = async () => {
+      const prompt = localStorage.getItem("create-form-prompt");
 
-    if (prompt) {
-      localStorage.removeItem("create-form-prompt");
+      if (prompt) {
+        localStorage.removeItem("create-form-prompt");
 
-      const userMessage: UIMessage = {
-        id: String(Date.now()),
-        role: "user",
-        parts: [{ type: "text", text: prompt }],
-      };
+        const userMessage: UIMessage = {
+          id: String(Date.now()),
+          role: "user",
+          parts: [{ type: "text", text: prompt }],
+        };
 
-      setMessages((prevMessages) => [...prevMessages, userMessage]);
-    }
+        // setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-    sendMessage && sendMessage(messages[messages.length - 1], {
-      
-    });
-  }, [setMessages]);
+        if (sendMessage) {
+          const chatRes = await sendMessage(userMessage, {});
+          console.log("Chat response:", chatRes);
+        }
+      }
+    };
+
+    loadPrompt();
+  }, [setMessages, sendMessage]);
 
   return (
     <div className="flex flex-col container max-w-6xl mx-auto h-full min-h-0 overflow-hidden p-4">
@@ -141,8 +146,6 @@ const PromptInputContainer = ({
 };
 
 const ConversationContainer = ({ messages }: { messages: UIMessage[] }) => {
-  console.log("Messages in ChatColumn:", messages.length);
-
   return (
     <Conversation className="conversation-scroll w-full max-h-[500px] md:max-h-[570px] overflow-y-auto overflow-x-hidden min-h-0">
       <ConversationContent>

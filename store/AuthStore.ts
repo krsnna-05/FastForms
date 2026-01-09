@@ -1,7 +1,5 @@
 import { create } from "zustand";
 
-2;
-
 type AuthState = {
   isAuthenticated: boolean;
   userId: string | null;
