@@ -65,7 +65,7 @@ class AppwriteService {
         rowId: userId,
       });
 
-      console.log("User fetched successfully:", res);
+      console.log("User fetched successfully.");
       return res;
     } catch (error) {
       console.log("Error fetching user by ID:", error);

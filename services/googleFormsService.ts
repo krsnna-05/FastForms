@@ -29,12 +29,14 @@ class googleFormsService {
     }
   }
 
-  setCred = (credentials: any) => {
-    this.oauth2client.setCredentials(credentials);
-  };
+  createform = (data: forms_v1.Params$Resource$Forms$Create) => {
+    if (!this.forms) {
+      throw new Error("Google Forms service not initialized");
+    }
 
-  createform = () => {
-    console.log("form created");
+    return this.forms.create({
+      requestBody: data.requestBody,
+    });
   };
 
   getform = (formId: string) => {

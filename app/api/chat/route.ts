@@ -4,16 +4,24 @@ import { convertToModelMessages, Output, streamText, UIMessage } from "ai";
 import systemPrompt from "@/systemPrompt.json";
 import z from "zod";
 import { buildGoogleFormRequestBody } from "./utils";
+import googleFormsService from "@/services/googleFormsService";
+import { useId } from "react";
 
 const askQuestion = async (
   prompt: UIMessage[],
-  promptType: "create" | "update"
+  promptType: "create" | "update",
+  userId: string
 ) => {
   if (promptType !== "create") {
     return new Response(JSON.stringify({ error: "Unsupported prompt type" }), {
       status: 400,
     });
   }
+
+  console.log("Creating Google Form...", userId, prompt);
+
+  const googleFormService = new googleFormsService();
+  await googleFormService.initialize(userId);
 
   const schema = z.object({
     message: z.string().describe("A brief message confirming form creation"),
@@ -40,6 +48,8 @@ const askQuestion = async (
     system: systemPrompt.systemPromptForCreateForm.content,
   });
 
+  console.log("LLM Output:", JSON.parse(output.text));
+
   const formData = schema.safeParse(JSON.parse(output.text));
   if (!formData.success) {
     return new Response(
@@ -54,9 +64,17 @@ const askQuestion = async (
     );
   }
 
+  console.log("Creating Google Form with data:", formData.data);
+
   const requestBody = buildGoogleFormRequestBody(formData.data);
 
-  return new Response(JSON.stringify(requestBody, null, 2), {
+  const res = await googleFormService.createform({
+    requestBody: requestBody,
+  });
+
+  console.log("Google Form created successfully:", res.data);
+
+  return new Response(JSON.stringify(res, null, 2), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
@@ -67,8 +85,12 @@ export async function POST(req: NextRequest) {
     const {
       messages,
       promptType,
-    }: { messages: UIMessage[]; promptType: "create" | "update" } =
-      await req.json();
+      userId,
+    }: {
+      messages: UIMessage[];
+      promptType: "create" | "update";
+      userId: string;
+    } = await req.json();
 
     if (!messages) {
       return new Response(
@@ -82,7 +104,7 @@ export async function POST(req: NextRequest) {
 
     const prompt = messages || "Who are you ?";
 
-    return await askQuestion(prompt, promptType);
+    return await askQuestion(prompt, promptType, userId);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return new Response(JSON.stringify({ error: message }), {
