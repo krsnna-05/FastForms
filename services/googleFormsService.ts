@@ -39,6 +39,20 @@ class googleFormsService {
     });
   };
 
+  updateForm = (
+    formId: string,
+    data: forms_v1.Params$Resource$Forms$Batchupdate
+  ) => {
+    if (!this.forms) {
+      throw new Error("Google Forms service not initialized");
+    }
+
+    return this.forms.batchUpdate({
+      formId: formId,
+      requestBody: data.requestBody,
+    });
+  };
+
   getform = (formId: string) => {
     if (!this.forms) {
       throw new Error("Google Forms service not initialized");

@@ -11,58 +11,62 @@ type field = {
   options?: string[];
 };
 
-function mapFieldToGoogleItem(field: field) {
+function mapFieldToGoogleItem(field: field, index: number) {
   const baseItem: any = {
-    title: field.question,
-    questionItem: {
-      question: {
-        required: field.required,
+    createItem: {
+      item: {
+        title: field.question,
+        questionItem: {
+          question: {
+            required: field.required,
+          },
+        },
+      },
+      location: {
+        index: index,
       },
     },
   };
 
   switch (field.type) {
     case "short_text":
-      baseItem.questionItem.question.textQuestion = {
+      baseItem.createItem.item.questionItem.question.textQuestion = {
         paragraph: false,
       };
       break;
 
     case "long_text":
-      baseItem.questionItem.question.textQuestion = {
+      baseItem.createItem.item.questionItem.question.textQuestion = {
         paragraph: true,
       };
       break;
 
     case "multiple_choice":
-      baseItem.questionItem.question.choiceQuestion = {
+      baseItem.createItem.item.questionItem.question.choiceQuestion = {
         type: "RADIO",
         options: (field.options ?? []).map((opt) => ({ value: opt })),
       };
       break;
 
     case "checkboxes":
-      baseItem.questionItem.question.choiceQuestion = {
+      baseItem.createItem.item.questionItem.question.choiceQuestion = {
         type: "CHECKBOX",
         options: (field.options ?? []).map((opt) => ({ value: opt })),
       };
       break;
   }
-
   return baseItem;
 }
 
 const buildGoogleFormRequestBody = (form: form) => {
   const baseRequestBody: any = {
-    info: {
-      title: form.formTitle,
-    },
-    items: [],
+    includeFormInResponse: true,
+    requests: [],
   };
 
-  form.form.forEach((field) => {
-    const googleItem = mapFieldToGoogleItem(field);
-    baseRequestBody.items.push(googleItem);
+  form.form.forEach((field, index) => {
+    const questionItem = mapFieldToGoogleItem(field, index);
+    baseRequestBody.requests.push(questionItem);
   });
 
   return baseRequestBody;

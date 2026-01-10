@@ -69,10 +69,17 @@ const askQuestion = async (
   const requestBody = buildGoogleFormRequestBody(formData.data);
 
   const res = await googleFormService.createform({
-    requestBody: requestBody,
+    requestBody: {
+      info: {
+        title: formData.data.formTitle,
+        documentTitle: formData.data.formTitle,
+      },
+    },
   });
 
-  console.log("Google Form created successfully:", res.data);
+  const formBody = buildGoogleFormRequestBody(formData.data);
+
+  console.log("Updating Google Form with body:", formBody);
 
   return new Response(JSON.stringify(res, null, 2), {
     status: 200,
