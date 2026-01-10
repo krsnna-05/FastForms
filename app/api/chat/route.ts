@@ -3,6 +3,7 @@ import { generateText, ollama } from "ai-sdk-ollama";
 import { convertToModelMessages, Output, streamText, UIMessage } from "ai";
 import systemPrompt from "@/systemPrompt.json";
 import z from "zod";
+import { buildGoogleFormRequestBody } from "./utils";
 
 const askQuestion = async (
   prompt: UIMessage[],
@@ -36,11 +37,26 @@ const askQuestion = async (
     model: ollama("ministral-3:3b"),
     output: Output.object({ schema }),
     messages: prompt,
-    system:
-      "You are a backend service. Convert the user instruction into a JSON object that strictly follows the given schema. Return ONLY valid JSON. Do not ask questions. Do not explain. Do not include markdown or extra text.",
+    system: systemPrompt.systemPromptForCreateForm.content,
   });
 
-  return new Response(JSON.stringify(JSON.parse(output.text), null, 2), {
+  const formData = schema.safeParse(JSON.parse(output.text));
+  if (!formData.success) {
+    return new Response(
+      JSON.stringify({
+        error: "Failed to parse form data",
+        details: formData.error,
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
+  const requestBody = buildGoogleFormRequestBody(formData.data);
+
+  return new Response(JSON.stringify(requestBody, null, 2), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
