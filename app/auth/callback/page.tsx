@@ -42,15 +42,20 @@ const CallbackContent = () => {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        authStore.setAuthState(
+          true,
+          data.user.id,
+          {
+            name: data.user.name,
+            email: data.user.email,
+            profilePhotoUrl: data.user.picture,
+          },
+          data.token
+        );
+
         setAuthState({
           state: "success",
           desc: "Login successful! Redirecting you now...",
-        });
-
-        authStore.setAuthState(true, data.user.id, {
-          name: data.user.name,
-          email: data.user.email,
-          profilePhotoUrl: data.user.picture,
         });
 
         // Redirect to home page after 2 seconds

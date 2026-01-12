@@ -24,8 +24,8 @@ const askQuestion = async (
   await googleFormService.initialize(userId);
 
   const schema = z.object({
-    message: z.string().describe("A brief message confirming form creation"),
     formTitle: z.string(),
+    formDescription: z.string(),
     form: z.array(
       z.object({
         type: z.enum([
@@ -44,7 +44,7 @@ const askQuestion = async (
   const output = await generateText({
     model: ollama("ministral-3:3b"),
     output: Output.object({ schema }),
-    messages: prompt,
+    messages: await convertToModelMessages(prompt),
     system: systemPrompt.systemPromptForCreateForm.content,
   });
 
@@ -114,6 +114,8 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = messages || "Who are you ?";
+
+    console.log("Received prompt:", prompt);
 
     return await askQuestion(prompt, promptType, userId);
   } catch (error) {

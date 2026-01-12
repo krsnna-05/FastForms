@@ -1,5 +1,4 @@
 type form = {
-  message: string;
   formTitle: string;
   form: field[];
 };

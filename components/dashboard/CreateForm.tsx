@@ -16,14 +16,17 @@ import {
   PromptInputTextarea,
   PromptInputTools,
 } from "../ai-elements/prompt-input";
+import { useChat } from "@ai-sdk/react";
 
 import { useRouter } from "next/navigation";
 
 import { SidebarTrigger } from "../ui/sidebar";
 import { Check, Clipboard, Lightbulb, Pencil, Star } from "lucide-react";
+import { createUIMessageStream } from "ai";
 
 const PromptInputCom = () => {
   const router = useRouter();
+  const { sendMessage, setMessages } = useChat();
 
   const handleSubmit = (
     message: PromptInputMessage,
@@ -33,8 +36,18 @@ const PromptInputCom = () => {
     setText("");
 
     const formId = crypto.randomUUID();
-
-    router.push(`/forms/${formId}?create=true`);
+    sendMessage(
+      {
+        text: message.text,
+      },
+      {
+        body: {
+          promptType: "create",
+          formId,
+        },
+      }
+    );
+    setMessages([]);
   };
 
   const [text, setText] = useState("");

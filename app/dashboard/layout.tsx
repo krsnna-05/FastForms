@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/dashboard/Sidebar";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
 
@@ -8,10 +9,12 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      {children}
-    </SidebarProvider>
+    <ProtectedRoute>
+      <SidebarProvider>
+        <AppSidebar />
+        {children}
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 };
 

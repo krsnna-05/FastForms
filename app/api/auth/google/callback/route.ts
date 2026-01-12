@@ -1,6 +1,7 @@
 import GoogleAuthService from "@/services/AuthService";
 import AppwriteService from "@/services/appwriteService";
 import { googleAuthScopes } from "@/providers/googleAuth";
+import { generateToken } from "@/lib/jwt";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -108,6 +109,11 @@ export async function POST(req: Request) {
       {
         success: true,
         message: "Token fetched successfully",
+        token: generateToken({
+          userId: userInfo.id!,
+          email: userInfo.email!,
+          name: userInfo.name!,
+        }),
         user: {
           id: userInfo.id,
           name: userInfo.name,
