@@ -1,4 +1,4 @@
-import { Bot, Zap, Settings, CheckCircle2 } from "lucide-react";
+import { Bot, Zap, Settings, CheckCircle2, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 
@@ -31,16 +31,16 @@ const Feature = ({
       icon: <Zap className="size-4 md:size-6" />,
     },
     {
-      heading: "Easy Customization",
-      description:
-        "Modify and edit your forms through natural conversation. Change questions, add logic, update styling effortlessly.",
-      icon: <Settings className="size-4 md:size-6" />,
-    },
-    {
       heading: "Seamless Integration",
       description:
         "Works directly with Google Forms. Your forms are stored in your Google Drive and fully compatible.",
       icon: <CheckCircle2 className="size-4 md:size-6" />,
+    },
+    {
+      heading: "Clean & Ready",
+      description:
+        "Forms are generated in a clean, ready-to-use format so you can start collecting responses immediately.",
+      icon: <Sparkles className="size-4 md:size-6" />,
     },
   ],
 }: FeatureProps) => {

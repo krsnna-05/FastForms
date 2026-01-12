@@ -21,7 +21,7 @@ const Hero = ({
     <FormIcon className=" text-primary bg-primary/20 p-1 size-8 rounded-sm border border-primary/50" />
   ),
   heading = "Lovable For Google Forms",
-  description = "Create and edit Google Forms by chatting. Transform your ideas into fully functional forms in seconds with our AI-powered form builder.",
+  description = "Create Google Forms by chatting. Transform your ideas into fully functional forms in seconds with our AI-powered form builder.",
   button,
   trustText = "Trusted by 250+ Users Worldwide",
   imageSrc = null,
