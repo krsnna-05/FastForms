@@ -12,6 +12,7 @@ export type userType = {
 class AppwriteService {
   private dbId: string = "69383e29001a811e9e49";
   private userTableId: string = "users";
+  private formTableId: string = "forms";
 
   constructor() {}
 
@@ -69,6 +70,43 @@ class AppwriteService {
       return res;
     } catch (error) {
       console.log("Error fetching user by ID:", error);
+      return null;
+    }
+  }
+
+  async createForm(userId: string, formData: any) {
+    try {
+      const res = await tablesDB.createRow({
+        databaseId: this.dbId,
+        tableId: this.formTableId,
+        rowId: ID.unique(),
+        data: {
+          userId,
+          ...formData,
+        },
+      });
+
+      return res;
+    } catch (error) {
+      console.log("Error creating form:", error);
+      return null;
+    }
+  }
+
+  async getFormsByUserId(userId: string) {
+    try {
+      const res = await tablesDB.listRows({
+        databaseId: this.dbId,
+        tableId: this.formTableId,
+        queries: [
+          Query.equal("createdByUserId", userId),
+          Query.select(["$id", "title"]),
+        ],
+      });
+
+      return res;
+    } catch (error) {
+      console.log("Error fetching forms by user ID:", error);
       return null;
     }
   }

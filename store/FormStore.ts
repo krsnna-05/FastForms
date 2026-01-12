@@ -4,6 +4,7 @@ type FormState = {
   forms: Array<{ id: string; title: string }>;
   addForm: (id: string, title: string) => void;
   removeForm: (id: string) => void;
+  setForms: (forms: Array<{ id: string; title: string }>) => void;
 };
 
 const useFormStore = create<FormState>((set) => ({
@@ -15,6 +16,10 @@ const useFormStore = create<FormState>((set) => ({
   removeForm: (id) =>
     set((state) => ({
       forms: state.forms.filter((form) => form.id !== id),
+    })),
+  setForms: (forms: Array<{ id: string; title: string }>) =>
+    set(() => ({
+      forms: forms,
     })),
 }));
 

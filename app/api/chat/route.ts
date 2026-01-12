@@ -63,32 +63,20 @@ const askQuestion = async (
       }
     );
   }
-
-  const requestBody = buildGoogleFormRequestBody(formData.data);
-
-  const res = await googleFormService.createform({
-    requestBody: {
-      info: {
-        title: formData.data.formTitle,
-        documentTitle: formData.data.formTitle,
+  return new Response(
+    JSON.stringify(
+      {
+        success: true,
+        form: formData.data,
       },
-    },
-  });
-
-  const formId = res.data.formId as string;
-
-  const formBody = buildGoogleFormRequestBody(formData.data);
-
-  console.log("Updating Google Form with body:", formBody);
-
-  await googleFormService.updateForm(formId, {
-    requestBody: formBody,
-  });
-
-  return new Response(JSON.stringify(res, null, 2), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+      null,
+      2
+    ),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 };
 
 export async function POST(req: NextRequest) {
@@ -113,11 +101,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const prompt = messages || "Who are you ?";
-
-    console.log("Received prompt:", prompt);
-
-    return await askQuestion(prompt, promptType, userId);
+    return await askQuestion(messages, promptType, userId);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return new Response(JSON.stringify({ error: message }), {

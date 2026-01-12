@@ -23,10 +23,12 @@ import { useRouter } from "next/navigation";
 import { SidebarTrigger } from "../ui/sidebar";
 import { Check, Clipboard, Lightbulb, Pencil, Star } from "lucide-react";
 import { createUIMessageStream } from "ai";
+import useAuthStore from "@/store/AuthStore";
 
 const PromptInputCom = () => {
   const router = useRouter();
   const { sendMessage, setMessages } = useChat();
+  const { userId } = useAuthStore();
 
   const handleSubmit = (
     message: PromptInputMessage,
@@ -44,6 +46,7 @@ const PromptInputCom = () => {
         body: {
           promptType: "create",
           formId,
+          userId: userId || "anonymous",
         },
       }
     );

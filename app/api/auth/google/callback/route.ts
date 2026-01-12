@@ -104,6 +104,7 @@ export async function POST(req: Request) {
 
       console.log("Existing user updated with new tokens for ID:", userId);
     }
+    const userId = userExists.rows[0].$id;
 
     return NextResponse.json(
       {
@@ -115,7 +116,7 @@ export async function POST(req: Request) {
           name: userInfo.name!,
         }),
         user: {
-          id: userInfo.id,
+          id: userId,
           name: userInfo.name,
           email: userInfo.email,
           picture: userInfo.picture,

@@ -1,7 +1,8 @@
 "use client";
 
-import { Menu, FormIcon } from "lucide-react";
+import { Menu, FormIcon, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import {
   Accordion,
@@ -15,6 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   NavigationMenu,
@@ -60,6 +62,14 @@ interface NavbarProps {
 }
 
 const AvatarName = ({ url, name }: { url: string; name: string }) => {
+  const router = useRouter();
+  const { logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -77,7 +87,14 @@ const AvatarName = ({ url, name }: { url: string; name: string }) => {
         <DropdownMenuItem asChild>
           <Link href="/dashboard">Dashboard</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={handleLogout}
+          className="text-destructive cursor-pointer"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -108,6 +125,12 @@ const Navbar = ({
   },
 }: NavbarProps) => {
   const authStore = useAuthStore();
+  const router = useRouter();
+
+  const handleMobileLogout = () => {
+    authStore.logout();
+    router.push("/");
+  };
 
   return (
     <section className="py-4 px-3 fixed w-full bg-background border-b border-primary z-50">
@@ -202,7 +225,12 @@ const Navbar = ({
                           </a>
                         </Button>
                       ) : (
-                        <Button variant="outline" className="w-full">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={handleMobileLogout}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
                           Logout
                         </Button>
                       )}

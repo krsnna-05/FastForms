@@ -1,6 +1,7 @@
 "use client";
 
 import { Inbox, Plus } from "lucide-react";
+import { useEffect } from "react";
 
 import {
   Sidebar,
@@ -16,6 +17,7 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import Link from "next/link";
 import useFormStore from "@/store/FormStore";
+import { useAuth } from "@/hooks/useAuth";
 
 export function AppSidebar() {
   return (
@@ -48,7 +50,50 @@ export function AppSidebar() {
 }
 
 const UserForms = () => {
-  const { forms } = useFormStore();
+  const { forms, setForms } = useFormStore();
+  const { userId, token } = useAuth();
+
+  useEffect(() => {
+    const fetchForms = async () => {
+      if (!userId || !token) return;
+
+      try {
+        const response = await fetch(`/api/forms?userId=${userId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          console.error("Failed to fetch forms:", response.statusText);
+          return;
+        }
+
+        const data = await response.json();
+        if (data.success && data.forms) {
+          setForms(data.forms);
+        }
+      } catch (error) {
+        console.error("Error fetching forms:", error);
+      }
+    };
+
+    fetchForms();
+  }, [userId, token, setForms]);
+
+  if (forms.length === 0) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="text-sm text-muted-foreground px-2">
+            No forms found
+          </div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <SidebarMenu>
