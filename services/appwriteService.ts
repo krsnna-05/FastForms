@@ -103,7 +103,7 @@ class AppwriteService {
         tableId: this.formTableId,
         queries: [
           Query.equal("createdByUserId", userId),
-          Query.select(["$id", "title"]),
+          Query.select(["$id", "formTitle", "createdByUserId"]),
         ],
       });
 

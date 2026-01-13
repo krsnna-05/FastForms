@@ -70,14 +70,27 @@ const askQuestion = async (
     createdByUserId: userId,
   });
 
-  console;
+  if (!formRes) {
+    return new Response(
+      JSON.stringify({ error: "Failed to create form in Appwrite" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
+  console.log("Form created in Appwrite:", formRes);
 
   return new Response(
     JSON.stringify(
       {
         success: true,
         userForm: formData.data,
-        form: formRes,
+        form: {
+          formId: formRes.$id,
+          title: formRes.formTitle,
+        },
       },
       null,
       2

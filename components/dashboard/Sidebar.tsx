@@ -75,6 +75,8 @@ const UserForms = () => {
         if (data.success && data.forms) {
           setForms(data.forms);
         }
+
+        console.log("Fetched forms:", data.forms);
       } catch (error) {
         console.error("Error fetching forms:", error);
       }
@@ -98,7 +100,7 @@ const UserForms = () => {
   return (
     <SidebarMenu>
       {forms.map((form) => (
-        <UserForm key={form.id} id={form.id} title={form.title} />
+        <UserForm key={form.$id} id={form.$id} title={form.formTitle} />
       ))}
     </SidebarMenu>
   );
@@ -110,6 +112,8 @@ type UserFormProps = {
 };
 
 const UserForm = ({ id, title }: UserFormProps) => {
+  console.log("Rendering UserForm with ID:", id, "and title:", title);
+
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild>

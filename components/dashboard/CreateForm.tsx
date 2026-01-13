@@ -24,6 +24,7 @@ import { SidebarTrigger } from "../ui/sidebar";
 import { Check, Clipboard, Lightbulb, Pencil, Star } from "lucide-react";
 import { createUIMessageStream } from "ai";
 import useAuthStore from "@/store/AuthStore";
+import useFormStore from "@/store/FormStore";
 
 const PromptInputCom = ({
   setLoading,
@@ -32,6 +33,7 @@ const PromptInputCom = ({
 }) => {
   const router = useRouter();
   const { sendMessage, setMessages, messages } = useChat();
+  const { addForm } = useFormStore();
   const { userId } = useAuthStore();
 
   console.log("User ID in CreateForm:", userId);
@@ -62,6 +64,8 @@ const PromptInputCom = ({
 
     const data = await res.json();
     console.log("Response data from /api/chat:", data);
+
+    addForm(data.form.formId, data.form.title);
 
     setMessages([]);
   };
