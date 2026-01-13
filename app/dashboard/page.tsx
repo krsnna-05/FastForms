@@ -1,8 +1,11 @@
+"use client";
 import CreateForm from "@/components/dashboard/CreateForm";
-import React from "react";
+import React, { useState } from "react";
 
 const AppPage = () => {
-  return <CreateForm />;
+  const [loading, setloading] = useState(true);
+
+  return <CreateForm setLoading={setloading} />;
 };
 
 export default AppPage;

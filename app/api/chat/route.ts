@@ -6,9 +6,10 @@ import z from "zod";
 import { buildGoogleFormRequestBody } from "./utils";
 import googleFormsService from "@/services/googleFormsService";
 import { useId } from "react";
+import appwriteService from "@/services/appwriteService";
 
 const askQuestion = async (
-  prompt: UIMessage[],
+  prompt: string,
   promptType: "create" | "update",
   userId: string
 ) => {
@@ -44,7 +45,7 @@ const askQuestion = async (
   const output = await generateText({
     model: ollama("ministral-3:3b"),
     output: Output.object({ schema }),
-    messages: await convertToModelMessages(prompt),
+    prompt: prompt,
     system: systemPrompt.systemPromptForCreateForm.content,
   });
 
@@ -63,11 +64,20 @@ const askQuestion = async (
       }
     );
   }
+
+  const formRes = await appwriteService.createForm(userId, {
+    formTitle: formData.data.formTitle,
+    createdByUserId: userId,
+  });
+
+  console;
+
   return new Response(
     JSON.stringify(
       {
         success: true,
-        form: formData.data,
+        userForm: formData.data,
+        form: formRes,
       },
       null,
       2
@@ -82,16 +92,16 @@ const askQuestion = async (
 export async function POST(req: NextRequest) {
   try {
     const {
-      messages,
+      prompt,
       promptType,
       userId,
     }: {
-      messages: UIMessage[];
+      prompt: string;
       promptType: "create" | "update";
       userId: string;
     } = await req.json();
 
-    if (!messages) {
+    if (!prompt) {
       return new Response(
         JSON.stringify({ error: "No prompt provided in the request body" }),
         {
@@ -101,10 +111,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return await askQuestion(messages, promptType, userId);
+    return await askQuestion(prompt, promptType, userId);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: message }), {
+    const stack = error instanceof Error ? error.stack : "";
+    console.error("Chat API Error:", { message, stack, error });
+    return new Response(JSON.stringify({ error: message, details: stack }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

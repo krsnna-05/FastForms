@@ -25,31 +25,44 @@ import { Check, Clipboard, Lightbulb, Pencil, Star } from "lucide-react";
 import { createUIMessageStream } from "ai";
 import useAuthStore from "@/store/AuthStore";
 
-const PromptInputCom = () => {
+const PromptInputCom = ({
+  setLoading,
+}: {
+  setLoading: (state: boolean) => void;
+}) => {
   const router = useRouter();
-  const { sendMessage, setMessages } = useChat();
+  const { sendMessage, setMessages, messages } = useChat();
   const { userId } = useAuthStore();
 
-  const handleSubmit = (
+  console.log("User ID in CreateForm:", userId);
+
+  const handleSubmit = async (
     message: PromptInputMessage,
     event: FormEvent<HTMLFormElement>
   ) => {
-    localStorage.setItem("create-form-prompt", message.text);
-    setText("");
-
     const formId = crypto.randomUUID();
-    sendMessage(
-      {
-        text: message.text,
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      {
-        body: {
-          promptType: "create",
-          formId,
-          userId: userId || "anonymous",
-        },
-      }
-    );
+      body: JSON.stringify({
+        promptType: "create",
+        userId,
+        prompt: message.text,
+        formId,
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("Error creating form:", await res.text());
+      return;
+    }
+
+    const data = await res.json();
+    console.log("Response data from /api/chat:", data);
+
     setMessages([]);
   };
 
@@ -143,9 +156,11 @@ const QuickTips = () => {
   );
 };
 
-const CreateForm = () => {
-  const [view, setView] = useState<"structure" | "chat">("structure");
-
+const CreateForm = ({
+  setLoading,
+}: {
+  setLoading: (state: boolean) => void;
+}) => {
   return (
     <div className="flex-1 text-foreground flex flex-col bg-background pt-24 p-6 items-center">
       {/* Header with Sidebar Trigger */}

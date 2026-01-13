@@ -74,16 +74,19 @@ class AppwriteService {
     }
   }
 
-  async createForm(userId: string, formData: any) {
+  async createForm(
+    userId: string,
+    formData: {
+      createdByUserId: string;
+      formTitle: string;
+    }
+  ) {
     try {
       const res = await tablesDB.createRow({
         databaseId: this.dbId,
         tableId: this.formTableId,
         rowId: ID.unique(),
-        data: {
-          userId,
-          ...formData,
-        },
+        data: formData,
       });
 
       return res;

@@ -69,14 +69,6 @@ export async function POST(req: Request) {
       ? new Date(res.tokens.expiry_date).toISOString()
       : null;
 
-    console.log("User exists response:", userExists);
-    console.log("Token expiry date:", expiryDate);
-    console.log("Token data:", {
-      accessToken: res.tokens.access_token,
-      refreshToken: res.tokens.refresh_token,
-      expiryDate: res.tokens.expiry_date,
-    });
-
     // Create or update user with tokens
     if (userExists && userExists.total === 0) {
       await AppwriteService.createUser({
@@ -86,8 +78,6 @@ export async function POST(req: Request) {
         accessToken: res.tokens.access_token || "",
         profilePhotoUrl: userInfo.picture || "",
       });
-
-      console.log("New user created with tokens");
     } else {
       const userId = userExists?.rows[0].$id;
 
@@ -111,7 +101,7 @@ export async function POST(req: Request) {
         success: true,
         message: "Token fetched successfully",
         token: generateToken({
-          userId: userInfo.id!,
+          userId: userId,
           email: userInfo.email!,
           name: userInfo.name!,
         }),
