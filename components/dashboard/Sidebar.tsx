@@ -54,6 +54,10 @@ const UserForms = () => {
   const { userId, token } = useAuth();
 
   useEffect(() => {
+    console.log("Current forms in store:", forms);
+  }, [forms]);
+
+  useEffect(() => {
     const fetchForms = async () => {
       if (!userId || !token) return;
 

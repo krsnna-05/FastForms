@@ -65,7 +65,14 @@ const PromptInputCom = ({
     const data = await res.json();
     console.log("Response data from /api/chat:", data);
 
+    console.log("Adding form to store:", data.form.formId, data.form.title);
+
     addForm(data.form.formId, data.form.title);
+
+    localStorage.setItem(
+      `form_${data.form.formId}`,
+      JSON.stringify(data.userForm)
+    );
 
     setMessages([]);
   };
