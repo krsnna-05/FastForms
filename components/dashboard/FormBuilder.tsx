@@ -7,7 +7,7 @@ import LoadingComponent from "./LoadingComponent";
 
 const FormBuilder = () => {
   const [view, setView] = useState<"structure" | "chat">("chat");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div className="flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden">

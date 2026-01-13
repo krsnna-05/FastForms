@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Checkbox } from "../ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { useParams } from "next/navigation";
 
 type FormField = {
   type: "short_text" | "long_text" | "multiple_choice" | "checkboxes";
@@ -187,22 +188,28 @@ const CheckboxesComponent = ({
 };
 
 const FormPreview = () => {
+  const { formId } = useParams();
+
+  const userForm = JSON.parse(localStorage.getItem(`form_${formId}`) || "{}");
+
+  console.log("Loaded form data for preview:", userForm);
+
   return (
     <div className="w-full overflow-y-auto p-6 md:p-8 bg-background min-h-screen">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Form Header */}
         <div className="rounded-lg border border-border bg-card shadow-sm p-8 space-y-2">
           <h1 className="text-4xl font-bold text-foreground">
-            {dummyFormData.formTitle}
+            {userForm.formTitle}
           </h1>
           <p className="text-muted-foreground text-base">
-            {dummyFormData.formDescription}
+            {userForm.formDescription}
           </p>
         </div>
 
         {/* Form Fields */}
         <div className="rounded-lg border border-border bg-card shadow-sm p-8 space-y-8">
-          {dummyFormData.fields.map((field, index) => (
+          {userForm.form.map((field, index) => (
             <div
               key={index}
               className={

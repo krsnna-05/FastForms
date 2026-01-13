@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { LayoutGrid, MessageCircle } from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
+import { useParams } from "next/navigation";
 
 const TopBar = () => {
   const [formName, setFormName] = useState("Untitled Form");
+  const { formId } = useParams();
+
+  const form = JSON.parse(localStorage.getItem(`form_${formId}`) || "{}");
+
   return (
     <div className=" border-b border-muted-foreground/50 backdrop-blur-sm bg-background h-14 flex items-center px-3">
       {/* Top section */}
@@ -18,7 +23,7 @@ const TopBar = () => {
               className="px-2 py-1 text-sm font-semibold text-foreground hover:bg-card/50 rounded-md transition-colors truncate flex-1 text-left"
               title="Click to edit form name"
             >
-              {formName}
+              {form.formTitle || formName}
             </p>
 
             <span className="text-xs text-muted-foreground/60 whitespace-nowrap">
