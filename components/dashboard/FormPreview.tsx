@@ -190,9 +190,9 @@ const CheckboxesComponent = ({
 const FormPreview = () => {
   const { formId } = useParams();
 
-  const userForm = JSON.parse(localStorage.getItem(`form_${formId}`) || "{}");
+  const local_form = JSON.parse(localStorage.getItem(`form_${formId}`) || "{}");
 
-  console.log("Loaded form data for preview:", userForm);
+  console.log("Loaded form data for preview:", local_form);
 
   return (
     <div className="w-full overflow-y-auto p-6 md:p-8 bg-background min-h-screen">
@@ -200,16 +200,16 @@ const FormPreview = () => {
         {/* Form Header */}
         <div className="rounded-lg border border-border bg-card shadow-sm p-8 space-y-2">
           <h1 className="text-4xl font-bold text-foreground">
-            {userForm.formTitle}
+            {local_form.form.userForm.formTitle}
           </h1>
           <p className="text-muted-foreground text-base">
-            {userForm.formDescription}
+            {local_form.form.userForm.formDescription}
           </p>
         </div>
 
         {/* Form Fields */}
         <div className="rounded-lg border border-border bg-card shadow-sm p-8 space-y-8">
-          {userForm.form.map((field, index) => (
+          {local_form.form.userForm.form.map((field, index) => (
             <div
               key={index}
               className={

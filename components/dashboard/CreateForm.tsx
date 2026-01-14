@@ -71,7 +71,7 @@ const PromptInputCom = ({
 
     localStorage.setItem(
       `form_${data.form.formId}`,
-      JSON.stringify(data.userForm)
+      JSON.stringify({ form: data, save: "local" })
     );
 
     setMessages([]);
