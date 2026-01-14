@@ -52,7 +52,35 @@ export async function POST(req: Request) {
 
   try {
     // Update the Google Form with the new structure
-    const result = await googleFormService.createform();
+    const result = await googleFormService.createform({
+      requestBody: {
+        info: {
+          title: form.formTitle,
+          documentTitle: form.formTitle,
+        },
+      },
+    });
+
+    const googleFormId = result.data.formId;
+
+    const updateFormRes = await googleFormService.updateForm(googleFormId!, {
+      requestBody: {
+        includeFormInResponse: true,
+        requests: [
+          {
+            updateFormInfo: {
+              info: {
+                description: form.formDescription,
+              },
+              updateMask: "description",
+            },
+          },
+          ...googleFormBody.requests,
+        ],
+      },
+    });
+
+    console.log("Google Form synced successfully:", result);
 
     return new Response(
       JSON.stringify({
