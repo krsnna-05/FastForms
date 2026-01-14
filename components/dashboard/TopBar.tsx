@@ -8,6 +8,7 @@ const TopBar = () => {
   const [formName, setFormName] = useState("Untitled Form");
   const [formStatus, setFormStatus] = useState<"local" | "cloud">("local");
   const { formId } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = JSON.parse(localStorage.getItem(`form_${formId}`) || "{}");
 
@@ -18,6 +19,8 @@ const TopBar = () => {
   const isLocalSave = formStatus === "local";
 
   const handleExport = async () => {
+    setIsLoading(true);
+
     const token = localStorage.getItem("auth_token");
     if (!token) {
       console.error("No authentication token found");
@@ -53,6 +56,7 @@ const TopBar = () => {
     console.log("Form marked as cloud-synced in localStorage");
 
     // Update state to trigger re-render
+    setIsLoading(false);
     setFormStatus("cloud");
   };
 
@@ -97,9 +101,13 @@ const TopBar = () => {
       </div>
 
       {formStatus == "local" && (
-        <Button className="shrink-0" onClick={handleExport}>
+        <Button
+          className="shrink-0"
+          onClick={handleExport}
+          disabled={isLoading}
+        >
           <UploadIcon className="mr-2 h-4 w-4" />
-          Export to Google Forms
+          {isLoading ? "Exporting..." : "Sync to Cloud"}
         </Button>
       )}
     </div>
