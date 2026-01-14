@@ -25,6 +25,7 @@ import { Check, Clipboard, Lightbulb, Pencil, Star } from "lucide-react";
 import { createUIMessageStream } from "ai";
 import useAuthStore from "@/store/AuthStore";
 import useFormStore from "@/store/FormStore";
+import LoadingComponent from "./LoadingComponent";
 
 const PromptInputCom = ({
   setLoading,
@@ -44,37 +45,49 @@ const PromptInputCom = ({
   ) => {
     const formId = crypto.randomUUID();
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        promptType: "create",
-        userId,
-        prompt: message.text,
-        formId,
-      }),
-    });
+    // Show loading state
+    setLoading(true);
 
-    if (!res.ok) {
-      console.error("Error creating form:", await res.text());
-      return;
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          promptType: "create",
+          userId,
+          prompt: message.text,
+          formId,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Error creating form:", await res.text());
+        setLoading(false);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Response data from /api/chat:", data);
+
+      console.log("Adding form to store:", data.form.formId, data.form.title);
+
+      addForm(data.form.formId, data.form.title);
+
+      localStorage.setItem(
+        `form_${data.form.formId}`,
+        JSON.stringify({ form: data, save: "local" })
+      );
+
+      setMessages([]);
+
+      // Route to the form page
+      router.push(`/forms/${data.form.formId}`);
+    } catch (error) {
+      console.error("Error during form creation:", error);
+      setLoading(false);
     }
-
-    const data = await res.json();
-    console.log("Response data from /api/chat:", data);
-
-    console.log("Adding form to store:", data.form.formId, data.form.title);
-
-    addForm(data.form.formId, data.form.title);
-
-    localStorage.setItem(
-      `form_${data.form.formId}`,
-      JSON.stringify({ form: data, save: "local" })
-    );
-
-    setMessages([]);
   };
 
   const [text, setText] = useState("");
@@ -172,6 +185,12 @@ const CreateForm = ({
 }: {
   setLoading: (state: boolean) => void;
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  if (isLoading) {
+    return <LoadingComponent />;
+  }
+
   return (
     <div className="flex-1 text-foreground flex flex-col bg-background pt-24 p-6 items-center">
       {/* Header with Sidebar Trigger */}
@@ -198,7 +217,7 @@ const CreateForm = ({
 
       {/* Main Content */}
       <div className="max-w-4xl w-full">
-        <PromptInputCom />
+        <PromptInputCom setLoading={setIsLoading} />
         <QuickTips />
       </div>
     </div>

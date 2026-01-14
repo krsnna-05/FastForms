@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LayoutGrid, MessageCircle, UploadIcon } from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
 import { useParams } from "next/navigation";
@@ -6,11 +6,16 @@ import { Button } from "../ui/button";
 
 const TopBar = () => {
   const [formName, setFormName] = useState("Untitled Form");
+  const [formStatus, setFormStatus] = useState<"local" | "cloud">("local");
   const { formId } = useParams();
 
   const form = JSON.parse(localStorage.getItem(`form_${formId}`) || "{}");
 
-  const isLocalSave = form.save === "local";
+  useEffect(() => {
+    setFormStatus(form.save === "cloud" ? "cloud" : "local");
+  }, [form]);
+
+  const isLocalSave = formStatus === "local";
 
   const handleExport = async () => {
     const token = localStorage.getItem("auth_token");
@@ -38,6 +43,17 @@ const TopBar = () => {
 
     const data = await res.json();
     console.log("Form synced successfully:", data);
+
+    // Update local storage to mark form as cloud-synced
+    const updatedForm = {
+      ...form,
+      save: "cloud",
+    };
+    localStorage.setItem(`form_${formId}`, JSON.stringify(updatedForm));
+    console.log("Form marked as cloud-synced in localStorage");
+
+    // Update state to trigger re-render
+    setFormStatus("cloud");
   };
 
   return (
@@ -57,7 +73,7 @@ const TopBar = () => {
               {form.formTitle || formName}
             </p>
 
-            {isLocalSave ? (
+            {formStatus === "local" ? (
               <span
                 className="text-xs px-2 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 font-medium"
                 title="This form is saved locally in your browser."
@@ -80,7 +96,7 @@ const TopBar = () => {
         </div>
       </div>
 
-      {isLocalSave && (
+      {formStatus == "local" && (
         <Button className="shrink-0" onClick={handleExport}>
           <UploadIcon className="mr-2 h-4 w-4" />
           Export to Google Forms

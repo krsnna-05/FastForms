@@ -11,7 +11,7 @@ const LoadingComponent: React.FC<LoadingComponentProps> = ({
   message = "Wait while we create your Google Form",
 }) => {
   return (
-    <div className="w-full h-full flex items-center justify-center bg-background">
+    <div className="w-full h-full flex items-center justify-center bg-background mt-24">
       <div className="flex flex-col items-center justify-center space-y-6 p-8">
         {/* Animated Loading Spinner */}
         <div className="relative w-20 h-20">
