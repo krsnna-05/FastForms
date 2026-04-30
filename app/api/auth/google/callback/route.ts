@@ -15,7 +15,7 @@ export async function POST(req: Request) {
           error_state: "invalid_code",
           message: "Authorization code is missing",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
           error_state: "token_fetch_failed",
           message: "Failed to fetch token",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
           success: false,
           error_state: "scopes_not_granted:forms",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
           error_state: "user_info_fetch_failed",
           message: "Failed to fetch user info",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
       if (!userId)
         return NextResponse.json(
           { success: false, message: "User ID not found" },
-          { status: 400 }
+          { status: 400 },
         );
 
       await AppwriteService.updateUser(userId, {
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
           picture: userInfo.picture,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error in auth callback:", error);
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
         error_state: "internal_server_error",
         message: "An error occurred during authentication",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

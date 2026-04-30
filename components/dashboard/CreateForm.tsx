@@ -114,12 +114,6 @@ const PromptInputCom = ({
       </PromptInputBody>
       <PromptInputFooter className="bg-background ">
         <PromptInputTools>
-          <PromptInputActionMenu>
-            <PromptInputActionMenuTrigger />
-            <PromptInputActionMenuContent>
-              <PromptInputActionAddAttachments />
-            </PromptInputActionMenuContent>
-          </PromptInputActionMenu>
         </PromptInputTools>
         <PromptInputSubmit />
       </PromptInputFooter>
