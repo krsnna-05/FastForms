@@ -13,6 +13,7 @@ const TopBar = () => {
   const form = JSON.parse(localStorage.getItem(`form_${formId}`) || "{}");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormStatus(form.save === "cloud" ? "cloud" : "local");
   }, [form]);
 
@@ -64,10 +65,8 @@ const TopBar = () => {
     <div className=" border-b border-muted-foreground/50 backdrop-blur-sm bg-background h-14 flex items-center px-3 justify-between">
       {/* Top section */}
       <div className="py-3 flex items-center gap-4 flex-1">
-        {/* Left - Sidebar trigger & Form name */}
+        {/* Form name */}
         <div className="flex items-center gap-3 min-w-0 flex-1 h-full">
-          <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors shrink-0" />
-
           {/* Form Name - Editable */}
           <div className="flex items-center gap-2">
             <p

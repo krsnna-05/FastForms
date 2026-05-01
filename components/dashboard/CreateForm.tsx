@@ -20,11 +20,8 @@ import { useChat } from "@ai-sdk/react";
 
 import { useRouter } from "next/navigation";
 
-import { SidebarTrigger } from "../ui/sidebar";
 import { Check, Clipboard, Lightbulb, Pencil, Star } from "lucide-react";
 import { createUIMessageStream } from "ai";
-import useAuthStore from "@/store/AuthStore";
-import useFormStore from "@/store/FormStore";
 import LoadingComponent from "./LoadingComponent";
 
 const PromptInputCom = ({
@@ -34,14 +31,12 @@ const PromptInputCom = ({
 }) => {
   const router = useRouter();
   const { sendMessage, setMessages, messages } = useChat();
-  const { addForm } = useFormStore();
-  const { userId } = useAuthStore();
 
   console.log("User ID in CreateForm:", userId);
 
   const handleSubmit = async (
     message: PromptInputMessage,
-    event: FormEvent<HTMLFormElement>
+    event: FormEvent<HTMLFormElement>,
   ) => {
     const formId = crypto.randomUUID();
 
@@ -77,7 +72,7 @@ const PromptInputCom = ({
 
       localStorage.setItem(
         `form_${data.form.formId}`,
-        JSON.stringify({ form: data, save: "local" })
+        JSON.stringify({ form: data, save: "local" }),
       );
 
       setMessages([]);
@@ -113,8 +108,7 @@ const PromptInputCom = ({
         />
       </PromptInputBody>
       <PromptInputFooter className="bg-background ">
-        <PromptInputTools>
-        </PromptInputTools>
+        <PromptInputTools></PromptInputTools>
         <PromptInputSubmit />
       </PromptInputFooter>
     </PromptInput>
@@ -173,49 +167,3 @@ const QuickTips = () => {
     </div>
   );
 };
-
-const CreateForm = ({
-  setLoading,
-}: {
-  setLoading: (state: boolean) => void;
-}) => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  if (isLoading) {
-    return <LoadingComponent />;
-  }
-
-  return (
-    <div className="flex-1 text-foreground flex flex-col bg-background pt-24 p-6 items-center">
-      {/* Header with Sidebar Trigger */}
-      <div className="mb-12 max-w-4xl w-full flex items-start justify-between">
-        <div className="flex-1">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/30">
-              <span className="text-xs font-semibold text-primary flex items-center gap-1">
-                <Star size={15} /> AI Powered
-              </span>
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold text-foreground mb-3">
-            Create New Form
-          </h1>
-          <p className="text-base text-muted-foreground">
-            Describe your form in plain English. AI will generate it instantly.
-          </p>
-        </div>
-        <div className="">
-          <SidebarTrigger className="text-foreground hover:bg-primary/10" />
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-4xl w-full">
-        <PromptInputCom setLoading={setIsLoading} />
-        <QuickTips />
-      </div>
-    </div>
-  );
-};
-
-export default CreateForm;

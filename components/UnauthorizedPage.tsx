@@ -3,6 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Lock, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 const UnauthorizedPage: React.FC = () => {
   const router = useRouter();
@@ -45,9 +46,9 @@ const UnauthorizedPage: React.FC = () => {
         <div className="pt-8 border-t border-border mt-8">
           <p className="text-sm text-muted-foreground">
             Need help?{" "}
-            <a href="/" className="text-primary hover:underline">
+            <Link href="/" className="text-primary hover:underline">
               Contact support
-            </a>
+            </Link>
           </p>
         </div>
       </div>

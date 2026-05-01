@@ -2,14 +2,7 @@
 
 import { Menu, FormIcon, LogOut } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,57 +12,28 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import useAuthStore from "@/store/AuthStore";
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import { AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-interface MenuItem {
-  title: string;
-  url: string;
-  description?: string;
-  icon?: React.ReactNode;
-  items?: MenuItem[];
-}
+// Dummy user data
+const DUMMY_USER = {
+  name: "John Doe",
+  avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+};
 
-interface NavbarProps {
-  logo?: {
-    url: string;
-    src: React.ReactNode;
-    alt: string;
-    title: string;
-  };
-  menu?: MenuItem[];
-  auth?: {
-    loginGoogle: {
-      title: string;
-      url: string;
-    };
-  };
-}
+// Dummy menu items
+const DEFAULT_MENU = [
+  { title: "Demo", url: "#demo" },
+  { title: "How it Works", url: "#howitworks" },
+  { title: "Features", url: "#features" },
+];
 
 const AvatarName = ({ url, name }: { url: string; name: string }) => {
-  const router = useRouter();
-  const { logout } = useAuthStore();
-
-  const handleLogout = () => {
-    logout();
-    router.push("/");
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -88,10 +52,7 @@ const AvatarName = ({ url, name }: { url: string; name: string }) => {
           <Link href="/dashboard">Dashboard</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={handleLogout}
-          className="text-destructive cursor-pointer"
-        >
+        <DropdownMenuItem className="text-destructive cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
           Logout
         </DropdownMenuItem>
@@ -100,95 +61,68 @@ const AvatarName = ({ url, name }: { url: string; name: string }) => {
   );
 };
 
-const Navbar = ({
-  logo = {
-    url: "/",
-    src: (
-      <FormIcon className=" text-primary bg-primary/20 p-1 size-8 rounded-sm border border-primary/50" />
-    ),
-    alt: "FastForms Logo",
-    title: "FastForms",
-  },
-  menu = [
-    { title: "Demo", url: "#" },
-    {
-      title: "Features",
-      url: "#",
-    },
-    {
-      title: "Pricing",
-      url: "#",
-    },
-  ],
-  auth = {
-    loginGoogle: { title: "Login with Google", url: "/api/auth/google" },
-  },
-}: NavbarProps) => {
-  const authStore = useAuthStore();
-  const router = useRouter();
-
-  const handleMobileLogout = () => {
-    authStore.logout();
-    router.push("/");
-  };
+const Navbar = () => {
+  const isAuthenticated = true; // Dummy: set to true for testing logged-in state
 
   return (
-    <section className="py-4 px-3 fixed w-full bg-background border-b border-primary z-50">
+    <section className="fixed w-full bg-background border-b border-primary z-50 h-16 flex items-center">
       <div className="mx-auto container">
         {/* Desktop Menu */}
-        <nav className="hidden items-center justify-around lg:flex mx-auto w-full ">
-          <div className="flex items-center gap-2">
-            {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
-              {logo.src}
-              <span className="text-lg font-semibold tracking-tighter">
-                {logo.title}
-              </span>
-            </a>
-          </div>
-          <div className="flex items-center">
-            <NavigationMenu>
-              <NavigationMenuList className="">
-                {menu.map((item) => renderMenuItem(item))}
-              </NavigationMenuList>
-            </NavigationMenu>
+        <nav className="hidden items-center justify-between lg:flex w-full">
+          {/* Logo */}
+          <a href="/" className="flex items-center gap-2">
+            <FormIcon className="text-primary bg-primary/20 p-1 size-8 rounded-sm border border-primary/50" />
+            <span className="text-lg font-semibold tracking-tighter">
+              FastForms
+            </span>
+          </a>
+
+          {/* Menu Items */}
+          <div className="flex items-center gap-8">
+            {DEFAULT_MENU.map((item) => (
+              <a
+                key={item.title}
+                href={item.url}
+                className="text-sm font-medium hover:text-primary transition-colors"
+              >
+                {item.title}
+              </a>
+            ))}
           </div>
 
-          {authStore.isAuthenticated ? (
-            <AvatarName
-              url={authStore.userData?.profilePhotoUrl || ""}
-              name={authStore.userData?.name || "User"}
-            />
-          ) : (
-            <div className="flex gap-2">
+          {/* Auth Section */}
+          <div>
+            {isAuthenticated ? (
+              <AvatarName url={DUMMY_USER.avatarUrl} name={DUMMY_USER.name} />
+            ) : (
               <Button asChild size="sm">
-                <a href={auth.loginGoogle.url}>
+                <a href="/api/auth/google">
                   <img
                     src="https://cdn.simpleicons.org/google/000000"
                     alt="google-icon"
                     className="size-4"
                   />
-                  {auth.loginGoogle.title}
+                  Login with Google
                 </a>
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </nav>
 
         {/* Mobile Menu */}
         <div className="block lg:hidden">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between w-full">
             {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
-              {logo.src}
+            <a href="/" className="flex items-center gap-2">
+              <FormIcon className="text-primary bg-primary/20 p-1 size-8 rounded-sm border border-primary/50" />
             </a>
+
+            {/* Mobile Menu Trigger */}
             <div className="flex items-center gap-3">
-              {authStore.isAuthenticated && (
-                <AvatarName
-                  url={authStore.userData?.profilePhotoUrl || ""}
-                  name={authStore.userData?.name || "User"}
-                />
+              {isAuthenticated && (
+                <AvatarName url={DUMMY_USER.avatarUrl} name={DUMMY_USER.name} />
               )}
+
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="icon">
@@ -198,38 +132,40 @@ const Navbar = ({
                 <SheetContent className="overflow-y-auto">
                   <SheetHeader>
                     <SheetTitle>
-                      <a href={logo.url} className="flex items-center gap-2">
-                        {logo.src}
+                      <a href="/" className="flex items-center gap-2">
+                        <FormIcon className="text-primary bg-primary/20 p-1 size-8 rounded-sm border border-primary/50" />
                       </a>
                     </SheetTitle>
                   </SheetHeader>
                   <div className="flex flex-col gap-6 p-4">
-                    <Accordion
-                      type="single"
-                      collapsible
-                      className="flex w-full flex-col gap-4"
-                    >
-                      {menu.map((item) => renderMobileMenuItem(item))}
-                    </Accordion>
+                    {/* Mobile Menu Items */}
+                    <div className="flex flex-col gap-4">
+                      {DEFAULT_MENU.map((item) => (
+                        <a
+                          key={item.title}
+                          href={item.url}
+                          className="text-md font-semibold hover:text-primary transition-colors"
+                        >
+                          {item.title}
+                        </a>
+                      ))}
+                    </div>
 
+                    {/* Mobile Auth Section */}
                     <div className="flex flex-col gap-3">
-                      {!authStore.isAuthenticated ? (
-                        <Button asChild>
-                          <a href={auth.loginGoogle.url}>
+                      {!isAuthenticated ? (
+                        <Button asChild className="w-full">
+                          <a href="/api/auth/google">
                             <img
                               src="https://cdn.simpleicons.org/google/000000"
                               alt="google-icon"
                               className="size-4"
                             />
-                            {auth.loginGoogle.title}
+                            Login with Google
                           </a>
                         </Button>
                       ) : (
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          onClick={handleMobileLogout}
-                        >
+                        <Button variant="outline" className="w-full">
                           <LogOut className="mr-2 h-4 w-4" />
                           Logout
                         </Button>
@@ -243,76 +179,6 @@ const Navbar = ({
         </div>
       </div>
     </section>
-  );
-};
-
-const renderMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground">
-          {item.items.map((subItem) => (
-            <NavigationMenuLink asChild key={subItem.title} className="w-80">
-              <SubMenuLink item={subItem} />
-            </NavigationMenuLink>
-          ))}
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-    );
-  }
-
-  return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink
-        href={item.url}
-        className="bg-background hover:bg-muted hover:text-accent-foreground group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors"
-      >
-        {item.title}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
-  );
-};
-
-const renderMobileMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-md py-0 font-semibold hover:no-underline">
-          {item.title}
-        </AccordionTrigger>
-        <AccordionContent className="mt-2">
-          {item.items.map((subItem) => (
-            <SubMenuLink key={subItem.title} item={subItem} />
-          ))}
-        </AccordionContent>
-      </AccordionItem>
-    );
-  }
-
-  return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
-      {item.title}
-    </a>
-  );
-};
-
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
-  return (
-    <a
-      className="hover:bg-muted hover:text-accent-foreground flex min-w-80 select-none flex-row gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors"
-      href={item.url}
-    >
-      <div className="text-foreground">{item.icon}</div>
-      <div>
-        <div className="text-sm font-semibold">{item.title}</div>
-        {item.description && (
-          <p className="text-muted-foreground text-sm leading-snug">
-            {item.description}
-          </p>
-        )}
-      </div>
-    </a>
   );
 };
 

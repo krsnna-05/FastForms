@@ -1,14 +1,15 @@
 import { Hero } from "@/components/Hero";
 import { Navbar } from "@/components/Navbar";
 import { Feature } from "@/components/Feature";
-import OptionalAuth from "@/components/OptionalAuth";
+import { HowItWorks } from "@/components/HowItWorks";
 
 const HomePage = () => {
   return (
-    <OptionalAuth>
+    <>
       <Hero />
+      <HowItWorks />
       <Feature />
-    </OptionalAuth>
+    </>
   );
 };
 

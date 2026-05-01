@@ -1,4 +1,5 @@
 import { FormIcon, Wifi, Zap, Chrome } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
@@ -28,7 +29,7 @@ const Hero = ({
   imageAlt = null,
 }: HeroProps) => {
   return (
-    <section className="overflow-hidden py-32">
+    <section id="demo" className="overflow-hidden py-32">
       <div className="container mx-auto">
         <div className="flex flex-col gap-5">
           <div className="relative flex flex-col gap-5">
@@ -54,14 +55,14 @@ const Hero = ({
             <div className="flex flex-col items-center justify-center gap-3 pb-12 pt-3">
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button size="lg" asChild>
-                  <a href="/">
+                  <Link href="/">
                     <img
                       src="https://cdn.simpleicons.org/google/000000"
                       alt="google-icon"
                       className="size-4"
                     />
                     Get Started with Google
-                  </a>
+                  </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
                   <a href="#features">
