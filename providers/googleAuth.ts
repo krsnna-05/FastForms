@@ -4,7 +4,7 @@ import { googleAuthConfig } from "@/config";
 export const oauth2Client = new google.auth.OAuth2(
   googleAuthConfig.google_auth_client,
   googleAuthConfig.google_auth_client_secret,
-  googleAuthConfig.googl_auth_redirect_url
+  googleAuthConfig.google_auth_redirect_url,
 );
 
 export const googleAuthScopes = [

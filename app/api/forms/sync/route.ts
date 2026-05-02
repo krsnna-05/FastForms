@@ -2,7 +2,6 @@
 
 import { extractToken, verifyToken } from "@/lib/jwt";
 import { buildGoogleFormRequestBody } from "../../chat/utils";
-import googleFormsService from "@/services/googleFormsService";
 
 export async function POST(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -12,7 +11,7 @@ export async function POST(req: Request) {
   if (!token) {
     return new Response(
       JSON.stringify({ error: "Unauthorized: No token provided" }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
+      { status: 401, headers: { "Content-Type": "application/json" } },
     );
   }
 
@@ -22,7 +21,7 @@ export async function POST(req: Request) {
     0;
     return new Response(
       JSON.stringify({ error: "Unauthorized: Invalid or expired token" }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
+      { status: 401, headers: { "Content-Type": "application/json" } },
     );
   }
 
@@ -35,7 +34,7 @@ export async function POST(req: Request) {
   if (!formId || !userId) {
     return new Response(
       JSON.stringify({ error: "Bad request: formId or userId is required" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
@@ -47,7 +46,7 @@ export async function POST(req: Request) {
 
   console.log(
     "Google Form Request Body:",
-    JSON.stringify(googleFormBody, null, 2)
+    JSON.stringify(googleFormBody, null, 2),
   );
 
   try {
@@ -88,7 +87,7 @@ export async function POST(req: Request) {
         message: "Form synced successfully",
         result,
       }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      { status: 200, headers: { "Content-Type": "application/json" } },
     );
   } catch (error) {
     console.error("Error syncing form:", error);
@@ -97,7 +96,7 @@ export async function POST(req: Request) {
         success: false,
         error: "Failed to sync form to Google Forms",
       }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
 }

@@ -1,7 +1,6 @@
-import { Hero } from "@/components/Hero";
-import { Navbar } from "@/components/Navbar";
-import { Feature } from "@/components/Feature";
-import { HowItWorks } from "@/components/HowItWorks";
+import { Hero } from "@/components/Home/Hero";
+import { Feature } from "@/components/Home/Feature";
+import { HowItWorks } from "@/components/Home/HowItWorks";
 
 const HomePage = () => {
   return (

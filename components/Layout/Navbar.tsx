@@ -18,7 +18,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import useAuthStore from "@/store/authStore";
+import Image from "next/image";
+import { handleAuth } from "@/services/client/auth";
 
 // Dummy user data
 const DUMMY_USER = {
@@ -36,7 +39,7 @@ const DEFAULT_MENU = [
 const AvatarName = ({ url, name }: { url: string; name: string }) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger>
         <div className="flex items-center gap-2 cursor-pointer">
           <Avatar>
             <AvatarImage src={url} alt={name} />
@@ -62,8 +65,7 @@ const AvatarName = ({ url, name }: { url: string; name: string }) => {
 };
 
 const Navbar = () => {
-  const isAuthenticated = true; // Dummy: set to true for testing logged-in state
-
+  const { isAuthenticated, user } = useAuthStore();
   return (
     <section className="fixed w-full bg-background border-b border-primary z-50 h-16 flex items-center">
       <div className="mx-auto container">
@@ -95,15 +97,20 @@ const Navbar = () => {
             {isAuthenticated ? (
               <AvatarName url={DUMMY_USER.avatarUrl} name={DUMMY_USER.name} />
             ) : (
-              <Button asChild size="sm">
-                <a href="/api/auth/google">
-                  <img
-                    src="https://cdn.simpleicons.org/google/000000"
-                    alt="google-icon"
-                    className="size-4"
-                  />
-                  Login with Google
-                </a>
+              <Button
+                size="sm"
+                onClick={handleAuth}
+                className="cursor-pointer gap-2"
+              >
+                <Image
+                  src="https://cdn.simpleicons.org/google/ffffff"
+                  alt="google-icon"
+                  className="size-4"
+                  height={16}
+                  width={16}
+                  unoptimized
+                />
+                Login with Google
               </Button>
             )}
           </div>
@@ -113,9 +120,9 @@ const Navbar = () => {
         <div className="block lg:hidden">
           <div className="flex items-center justify-between w-full">
             {/* Logo */}
-            <a href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <FormIcon className="text-primary bg-primary/20 p-1 size-8 rounded-sm border border-primary/50" />
-            </a>
+            </Link>
 
             {/* Mobile Menu Trigger */}
             <div className="flex items-center gap-3">
@@ -154,15 +161,13 @@ const Navbar = () => {
                     {/* Mobile Auth Section */}
                     <div className="flex flex-col gap-3">
                       {!isAuthenticated ? (
-                        <Button asChild className="w-full">
-                          <a href="/api/auth/google">
-                            <img
-                              src="https://cdn.simpleicons.org/google/000000"
-                              alt="google-icon"
-                              className="size-4"
-                            />
-                            Login with Google
-                          </a>
+                        <Button onClick={handleAuth} className="w-full gap-2">
+                          <Image
+                            src="https://cdn.simpleicons.org/google/ffffff"
+                            alt="google-icon"
+                            className="size-4"
+                          />
+                          Login with Google
                         </Button>
                       ) : (
                         <Button variant="outline" className="w-full">

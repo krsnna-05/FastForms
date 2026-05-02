@@ -66,8 +66,8 @@ const HowItWorks = () => {
 
         <div className="mt-16 p-8 bg-primary/5 rounded-lg border border-primary/10">
           <p className="text-center text-muted-foreground">
-            Get started today and create your first form in minutes. It&apos;s free
-            and easy.
+            Get started today and create your first form in minutes. It&apos;s
+            free and easy.
           </p>
         </div>
       </div>
