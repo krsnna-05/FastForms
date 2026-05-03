@@ -1,4 +1,4 @@
-import { createGoogleAuthUrl } from "@/services/server/auth/googleAuth";
+import { createGoogleAuthUrl } from "@/services/server/auth/auth";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {

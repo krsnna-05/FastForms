@@ -14,6 +14,7 @@ export const appwriteConfig = {
   appwrite_endpoint: process.env.APPWRITE_ENDPOINT || "",
   appwrite_project_id: process.env.APPWRITE_PROJECT_ID || "",
   appwrite_api_key: process.env.APPWRITE_API_KEY || "",
+  appwrite_bucket_id: process.env.APPWRITE_BUCKET_ID || "",
 };
 
 export const databaseURL = process.env.DATABASE_URL || "";

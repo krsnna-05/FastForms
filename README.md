@@ -19,6 +19,7 @@ FastForms is a learning and portfolio project that demonstrates how AI can simpl
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Next.js 16** - React framework with Turbopack for fast development
 - **TypeScript** - Type-safe JavaScript
 - **Tailwind CSS** - Utility-first CSS framework
@@ -26,6 +27,7 @@ FastForms is a learning and portfolio project that demonstrates how AI can simpl
 - **Lucide React** - Beautiful icon library
 
 ### Backend
+
 - **Node.js** - JavaScript runtime
 - **TypeScript** - Type-safe backend code
 - **Express.js** - Lightweight web framework
@@ -50,23 +52,27 @@ FastForms/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js (v18+)
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
 cd FastForms
 ```
 
 2. **Install Frontend Dependencies**
+
 ```bash
 cd frontend
 npm install
 ```
 
 3. **Install Backend Dependencies**
+
 ```bash
 cd ../backend
 npm install
@@ -75,22 +81,27 @@ npm install
 ### Running the Project
 
 **Frontend (Development)**
+
 ```bash
 cd frontend
 npm run dev
 ```
+
 Runs on `http://localhost:3000`
 
 **Backend (Development)**
+
 ```bash
 cd backend
 npm run dev
 ```
+
 Runs on `http://localhost:3000` (configure as needed)
 
 **Build for Production**
 
 Frontend:
+
 ```bash
 cd frontend
 npm run build
@@ -98,6 +109,7 @@ npm run start
 ```
 
 Backend:
+
 ```bash
 cd backend
 npm run build
@@ -107,6 +119,7 @@ npm run serve
 ## 🎓 Learning Goals
 
 This project is designed to help me learn and demonstrate:
+
 - ✅ Full-stack web development (Next.js + Express.js)
 - ✅ TypeScript and type-safe code
 - ✅ API integration with Google Forms
@@ -118,6 +131,7 @@ This project is designed to help me learn and demonstrate:
 ## 📝 Project Status
 
 Currently in active development with the following phases:
+
 - [x] Frontend scaffold with Next.js
 - [x] Navigation and Hero components
 - [ ] Backend API setup

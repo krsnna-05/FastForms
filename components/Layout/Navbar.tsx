@@ -166,6 +166,8 @@ const Navbar = () => {
                             src="https://cdn.simpleicons.org/google/ffffff"
                             alt="google-icon"
                             className="size-4"
+                            width={16}
+                            height={16}
                           />
                           Login with Google
                         </Button>
