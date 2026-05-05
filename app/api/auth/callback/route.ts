@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     const fileBlob = await imgURLtoBlob(userInfo.picture || "");
     const fileName = `profile_${userInfo.email}.jpg`;
 
-    await storeImageInAppwrite({ imgBlob: fileBlob, fileName });
+    const fileId = await storeImageInAppwrite({ imgBlob: fileBlob, fileName });
 
     // Check if user exists
     const { exists: userExists, userId: existingUserId } =
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       const newUser = await createUser({
         email: userInfo.email,
         name: userInfo.name,
-        profileId: fileName, // Using fileName as profileId
+        profileId: fileId, // Using proper Appwrite fileId
         googleId: userInfo.id,
       });
       userId = newUser.id;

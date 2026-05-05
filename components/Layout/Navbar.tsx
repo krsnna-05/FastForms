@@ -2,15 +2,9 @@
 
 import { Menu, FormIcon, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -21,13 +15,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import useAuthStore from "@/store/authStore";
 import Image from "next/image";
-import { handleAuth } from "@/services/client/auth";
-
-// Dummy user data
-const DUMMY_USER = {
-  name: "John Doe",
-  avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-};
+import { handleAuth, handleLogout } from "@/services/client/auth";
+import { useAuth } from "@/hooks/useAuth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Dummy menu items
 const DEFAULT_MENU = [
@@ -36,48 +26,79 @@ const DEFAULT_MENU = [
   { title: "Features", url: "#features" },
 ];
 
-const AvatarName = ({ url, name }: { url: string; name: string }) => {
+const AvatarName = ({ url, name }: { url: string | null; name: string }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [hideTimeout, setHideTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (hideTimeout) clearTimeout(hideTimeout);
+    setShowDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setShowDropdown(false);
+    }, 200);
+    setHideTimeout(timeout);
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <div className="flex items-center gap-2 cursor-pointer">
-          <Avatar>
-            <AvatarImage src={url} alt={name} />
-            <AvatarFallback className="bg-primary text-white font-semibold">
-              {name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <p>{name}</p>
+    <div
+      className="relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="flex items-center gap-2 cursor-pointer">
+        <Avatar>
+          <AvatarImage src={url || ""} alt={name} />
+          <AvatarFallback className="bg-primary text-white font-semibold">
+            {name.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <p className="hidden sm:inline text-sm font-medium">{name}</p>
+      </div>
+
+      {/* Custom Hover Dropdown */}
+      {showDropdown && (
+        <div className="absolute top-full right-0 mt-1 w-48 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+          <Link
+            href="/dashboard"
+            className="block px-4 py-3 text-sm font-medium hover:bg-muted transition-colors border-b border-border"
+            onClick={() => setShowDropdown(false)}
+          >
+            Dashboard
+          </Link>
+          <button
+            onClick={() => {
+              setShowDropdown(false);
+              handleLogout();
+            }}
+            className="w-full text-left px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <Link href="/dashboard">Dashboard</Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive cursor-pointer">
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      )}
+    </div>
   );
 };
 
 const Navbar = () => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { user, isAuthenticated, loading } = useAuth();
+
   return (
     <section className="fixed w-full bg-background border-b border-primary z-50 h-16 flex items-center">
       <div className="mx-auto container">
         {/* Desktop Menu */}
         <nav className="hidden items-center justify-between lg:flex w-full">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <FormIcon className="text-primary bg-primary/20 p-1 size-8 rounded-sm border border-primary/50" />
             <span className="text-lg font-semibold tracking-tighter">
               FastForms
             </span>
-          </a>
+          </Link>
 
           {/* Menu Items */}
           <div className="flex items-center gap-8">
@@ -94,8 +115,10 @@ const Navbar = () => {
 
           {/* Auth Section */}
           <div>
-            {isAuthenticated ? (
-              <AvatarName url={DUMMY_USER.avatarUrl} name={DUMMY_USER.name} />
+            {loading ? (
+              <Skeleton className="h-10 w-10 rounded-full" />
+            ) : isAuthenticated && user.name ? (
+              <AvatarName url={user.avatarUrl} name={user.name} />
             ) : (
               <Button
                 size="sm"
@@ -126,8 +149,13 @@ const Navbar = () => {
 
             {/* Mobile Menu Trigger */}
             <div className="flex items-center gap-3">
-              {isAuthenticated && (
-                <AvatarName url={DUMMY_USER.avatarUrl} name={DUMMY_USER.name} />
+              {loading ? (
+                <Skeleton className="h-10 w-10 rounded-full" />
+              ) : (
+                isAuthenticated &&
+                user.name && (
+                  <AvatarName url={user.avatarUrl} name={user.name} />
+                )
               )}
 
               <Sheet>
@@ -172,7 +200,11 @@ const Navbar = () => {
                           Login with Google
                         </Button>
                       ) : (
-                        <Button variant="outline" className="w-full">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={handleLogout}
+                        >
                           <LogOut className="mr-2 h-4 w-4" />
                           Logout
                         </Button>

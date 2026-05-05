@@ -36,7 +36,10 @@ const convertExpirationHoursToSecond = (): number => {
     throw new Error("JWT expiration time must be provided");
   }
 
-  const seconds = 60 * 60 * parseInt(expiration); // Default to 1 hour
+  // If it's already in seconds format (number), use it directly
+  // If it's in hours format (e.g., "24"), convert to seconds
+  const expirationNum = parseInt(expiration);
+  const seconds = 60 * 60 * expirationNum; // Convert hours to seconds
 
   return seconds;
 };

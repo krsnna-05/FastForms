@@ -1,7 +1,10 @@
+"use client";
+
 import { FormIcon, Wifi, Zap, Chrome } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 interface HeroProps {
   icon?: React.ReactNode;
@@ -28,6 +31,8 @@ const Hero = ({
   imageSrc = null,
   imageAlt = null,
 }: HeroProps) => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <section id="demo" className="overflow-hidden py-32">
       <div className="container mx-auto">
@@ -54,21 +59,36 @@ const Hero = ({
             </p>
             <div className="flex flex-col items-center justify-center gap-3 pb-12 pt-3">
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button size="lg" asChild>
-                  <Link href="/">
-                    <img
-                      src="https://cdn.simpleicons.org/google/000000"
-                      alt="google-icon"
-                      className="size-4"
-                    />
-                    Get Started with Google
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <a href="#features">
-                    View Features <Zap className="ml-2 size-4" />
-                  </a>
-                </Button>
+                {isAuthenticated ? (
+                  <>
+                    <Button size="lg" asChild>
+                      <Link href="/dashboard">
+                        Go to Dashboard <Zap className="ml-2 size-4" />
+                      </Link>
+                    </Button>
+                    <Button size="lg" variant="outline" asChild>
+                      <a href="#features">View Features</a>
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button size="lg" asChild>
+                      <Link href="/api/auth">
+                        <img
+                          src="https://cdn.simpleicons.org/google/000000"
+                          alt="google-icon"
+                          className="size-4"
+                        />
+                        Get Started with Google
+                      </Link>
+                    </Button>
+                    <Button size="lg" variant="outline" asChild>
+                      <a href="#features">
+                        View Features <Zap className="ml-2 size-4" />
+                      </a>
+                    </Button>
+                  </>
+                )}
               </div>
               {trustText && (
                 <div className="text-muted-foreground text-xs">{trustText}</div>

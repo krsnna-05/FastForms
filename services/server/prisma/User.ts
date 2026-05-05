@@ -5,6 +5,20 @@ type returncheckExistingUser = {
   userId: number | null;
 };
 
+export const getUserById = async (userId: number) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    return user;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("getUserById error:", error);
+    return null;
+  }
+};
+
 export const checkExistingUser = async (
   email: string,
 ): Promise<returncheckExistingUser> => {
