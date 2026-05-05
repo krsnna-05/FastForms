@@ -4,9 +4,12 @@ import {
   exchangeCodeForTokens,
   getGoogleUserInfo,
   imgURLtoBlob,
-  storeImageInAppwrite,
 } from "@/services/server/auth/auth";
+
+import { storeImageInAppwrite } from "@/services/server/auth/appwrite";
 import { oauth2Client } from "@/providers/googleAuth";
+import { checkExistingUser, createUser } from "@/services/server/prisma/User";
+import { generateJWT } from "@/services/server/auth/jwt";
 
 export async function GET(request: NextRequest) {
   try {
@@ -51,9 +54,49 @@ export async function GET(request: NextRequest) {
     const fileBlob = await imgURLtoBlob(userInfo.picture || "");
     const fileName = `profile_${userInfo.email}.jpg`;
 
-    const fileId = await storeImageInAppwrite({ imgBlob: fileBlob, fileName });
+    await storeImageInAppwrite({ imgBlob: fileBlob, fileName });
 
-    const response = NextResponse.redirect("/");
+    // Check if user exists
+    const { exists: userExists, userId: existingUserId } =
+      await checkExistingUser(userInfo.email);
+
+    let userId: number;
+
+    if (userExists && existingUserId) {
+      userId = existingUserId;
+    } else {
+      // Create new user
+      const newUser = await createUser({
+        email: userInfo.email,
+        name: userInfo.name,
+        profileId: fileName, // Using fileName as profileId
+        googleId: userInfo.id,
+      });
+      userId = newUser.id;
+    }
+
+    // Generate JWT token
+    const token = await generateJWT(userId.toString());
+
+    // Create response with redirect
+    const response = NextResponse.redirect(
+      new URL("/", request.nextUrl.origin),
+    );
+
+    // Set cookies
+    response.cookies.set("userId", userId.toString(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
 
     return response;
   } catch (error) {

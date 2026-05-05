@@ -1,7 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
   provider = "prisma-client"
@@ -12,12 +9,84 @@ datasource db {
   provider = "postgresql"
 }
 
-
+// =======================
+// USER MODEL
+// =======================
 model User { 
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  profileUrl String?
-  lastLogin DateTime @default(now())
-  createdAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  googleId      String   @unique
+  email         String   @unique
+  name          String?
+  profileImgId  String?
+  lastLogin     DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  forms         Form[]
 } 
+
+// =======================
+// FORM MODEL
+// =======================
+model Form {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  creatorId   Int
+  creator     User     @relation(fields: [creatorId], references: [id])
+
+  fields      Field[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([creatorId])
+}
+
+// =======================
+// FIELD MODEL
+// =======================
+model Field {
+  id        Int      @id @default(autoincrement())
+  formId    Int
+  form      Form     @relation(fields: [formId], references: [id])
+
+  label     String
+  type      Type
+  required  Boolean  @default(false)
+  order     Int
+
+  options   Option[]
+
+  createdAt DateTime @default(now())
+
+  @@index([formId])
+  @@unique([formId, order])
+}
+
+// =======================
+// OPTION MODEL
+// =======================
+model Option {
+  id        Int      @id @default(autoincrement())
+  fieldId   Int
+  field     Field    @relation(fields: [fieldId], references: [id])
+
+  value     String
+  order     Int
+
+  createdAt DateTime @default(now())
+
+  @@index([fieldId])
+  @@unique([fieldId, order])
+}
+
+// =======================
+// ENUMS
+// =======================
+enum Type {
+  TEXT
+  PARA
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  DROPDOWN
+}

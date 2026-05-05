@@ -9,10 +9,9 @@ type User = {
 
 interface AuthState {
   user: User;
-  setUser: (user: User) => void;
-  clearUser: () => void;
+  login: (user: User) => void;
+  logout: () => void;
   isAuthenticated: boolean;
-  setAuthenticated: (isAuth: boolean) => void;
 }
 
 const useAuthStore = create<AuthState>((set) => ({
@@ -22,18 +21,22 @@ const useAuthStore = create<AuthState>((set) => ({
     email: null,
     avatarUrl: null,
   },
-  setUser: (user: User) => set({ user }),
-  clearUser: () =>
-    set({
+  isAuthenticated: false,
+  login: (user) =>
+    set(() => ({
+      user,
+      isAuthenticated: true,
+    })),
+  logout: () =>
+    set(() => ({
       user: {
         id: null,
         name: null,
         email: null,
         avatarUrl: null,
       },
-    }),
-  isAuthenticated: false,
-  setAuthenticated: (isAuth: boolean) => set({ isAuthenticated: isAuth }),
+      isAuthenticated: false,
+    })),
 }));
 
 export default useAuthStore;

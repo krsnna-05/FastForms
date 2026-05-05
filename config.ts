@@ -17,4 +17,14 @@ export const appwriteConfig = {
   appwrite_bucket_id: process.env.APPWRITE_BUCKET_ID || "",
 };
 
+export const jwtConfig = {
+  jwt_key: process.env.JWT_KEY || "",
+  jwt_passphrase: process.env.JWT_PASSPRASE || "",
+  jwt_secret: {
+    key: process.env.JWT_KEY || "",
+    passphrase: process.env.JWT_PASSPRASE || "",
+  },
+  jwt_expiration: process.env.JWT_EXPIRATION || "1h",
+};
+
 export const databaseURL = process.env.DATABASE_URL || "";
