@@ -3,6 +3,7 @@
 import { Hero } from "@/components/Home/Hero";
 import { Feature } from "@/components/Home/Feature";
 import { HowItWorks } from "@/components/Home/HowItWorks";
+import Footer from "@/components/Home/Footer";
 import { useAuth } from "@/hooks/useAuth";
 
 const HomePage = () => {
@@ -21,6 +22,7 @@ const HomePage = () => {
       <Hero />
       <HowItWorks />
       <Feature />
+      <Footer />
     </>
   );
 };

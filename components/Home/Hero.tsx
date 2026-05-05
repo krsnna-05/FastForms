@@ -67,7 +67,7 @@ const Hero = ({
                       </Link>
                     </Button>
                     <Button size="lg" variant="outline" asChild>
-                      <a href="#features">View Features</a>
+                      <Link href="#features">View Features</Link>
                     </Button>
                   </>
                 ) : (
@@ -83,9 +83,9 @@ const Hero = ({
                       </Link>
                     </Button>
                     <Button size="lg" variant="outline" asChild>
-                      <a href="#features">
+                      <Link href="#features">
                         View Features <Zap className="ml-2 size-4" />
-                      </a>
+                      </Link>
                     </Button>
                   </>
                 )}

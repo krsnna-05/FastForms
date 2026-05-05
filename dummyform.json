@@ -1,0 +1,60 @@
+{
+  "title": "Customer Feedback Form",
+  "description": "Help us improve by sharing your feedback",
+  "fields": [
+    {
+      "label": "Full Name",
+      "type": "TEXT",
+      "required": true,
+      "order": 1
+    },
+    {
+      "label": "Email Address",
+      "type": "TEXT",
+      "required": true,
+      "order": 2
+    },
+    {
+      "label": "What is your overall experience?",
+      "type": "SINGLE_CHOICE",
+      "required": true,
+      "order": 3,
+      "options": [
+        { "value": "Excellent", "order": 1 },
+        { "value": "Good", "order": 2 },
+        { "value": "Average", "order": 3 },
+        { "value": "Poor", "order": 4 }
+      ]
+    },
+    {
+      "label": "Which features did you use? (Select all that apply)",
+      "type": "MULTIPLE_CHOICE",
+      "required": false,
+      "order": 4,
+      "options": [
+        { "value": "Feature A", "order": 1 },
+        { "value": "Feature B", "order": 2 },
+        { "value": "Feature C", "order": 3 },
+        { "value": "Feature D", "order": 4 }
+      ]
+    },
+    {
+      "label": "What is your preferred contact method?",
+      "type": "DROPDOWN",
+      "required": false,
+      "order": 5,
+      "options": [
+        { "value": "Email", "order": 1 },
+        { "value": "Phone", "order": 2 },
+        { "value": "SMS", "order": 3 },
+        { "value": "Not interested", "order": 4 }
+      ]
+    },
+    {
+      "label": "Additional comments or suggestions",
+      "type": "PARA",
+      "required": false,
+      "order": 6
+    }
+  ]
+}

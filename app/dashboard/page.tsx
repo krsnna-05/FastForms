@@ -1,60 +1,86 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, ChevronRight } from "lucide-react";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import Link from "next/link";
 
 interface Form {
-  id: string;
+  id: string | number;
   title: string;
-  created: string;
-  lastUpdated: string;
+  created?: string;
+  createdAt?: string;
+  lastUpdated?: string;
+  updatedAt?: string;
 }
 
 const DashBoard = () => {
-  const [forms, setForms] = useState<Form[]>([
-    {
-      id: "1",
-      title: "Customer Feedback Survey",
-      created: "2024-04-15",
-      lastUpdated: "2024-05-01",
-    },
-    {
-      id: "2",
-      title: "Product Registration",
-      created: "2024-04-10",
-      lastUpdated: "2024-04-28",
-    },
-    {
-      id: "3",
-      title: "Event Registration Form",
-      created: "2024-03-20",
-      lastUpdated: "2024-04-25",
-    },
-    {
-      id: "4",
-      title: "Job Application",
-      created: "2024-03-01",
-      lastUpdated: "2024-04-20",
-    },
-  ]);
+  const [forms, setForms] = useState<Form[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleCreateForm = () => {
-    const newForm: Form = {
-      id: String(forms.length + 1),
-      title: "Untitled Form",
-      created: new Date().toISOString().split("T")[0],
-      lastUpdated: new Date().toISOString().split("T")[0],
+  useEffect(() => {
+    const fetchForms = async () => {
+      try {
+        const response = await fetch("/api/forms", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setForms(data);
+        } else {
+          setForms([]);
+        }
+      } catch (error) {
+        console.error("Error fetching forms:", error);
+        setForms([]);
+      } finally {
+        setLoading(false);
+      }
     };
-    setForms([newForm, ...forms]);
+
+    fetchForms();
+  }, []);
+
+  const handleCreateForm = async () => {
+    try {
+      const response = await fetch("/api/forms", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const newForm = await response.json();
+        setForms([newForm, ...forms]);
+      } else {
+        console.error("Failed to create form");
+      }
+    } catch (error) {
+      console.error("Error creating form:", error);
+    }
   };
 
-  const handleDeleteForm = (id: string) => {
-    setForms(forms.filter((f) => f.id !== id));
+  const handleDeleteForm = async (id: string | number) => {
+    try {
+      const response = await fetch(`/api/forms?id=${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setForms(forms.filter((f) => f.id !== id));
+      } else {
+        console.error("Failed to delete form");
+      }
+    } catch (error) {
+      console.error("Error deleting form:", error);
+    }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -62,6 +88,16 @@ const DashBoard = () => {
       year: "numeric",
     });
   };
+
+  if (loading) {
+    return (
+      <ProtectedRoute>
+        <div className="pt-24 pb-12 px-4 md:px-8 min-h-screen bg-background to-muted/30 flex items-center justify-center">
+          <p className="text-muted-foreground">Loading forms...</p>
+        </div>
+      </ProtectedRoute>
+    );
+  }
 
   return (
     <ProtectedRoute>
@@ -133,7 +169,7 @@ const DashBoard = () => {
                         Created
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {formatDate(form.created)}
+                        {formatDate(form.createdAt || form.created)}
                       </p>
                     </div>
 
@@ -143,7 +179,7 @@ const DashBoard = () => {
                         Last Updated
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {formatDate(form.lastUpdated)}
+                        {formatDate(form.updatedAt || form.lastUpdated)}
                       </p>
                     </div>
 
@@ -155,10 +191,10 @@ const DashBoard = () => {
                         size="sm"
                         asChild
                       >
-                        <a href={`/forms/${form.id}`}>
+                        <Link href={`/forms/${form.id}`}>
                           Open
                           <ChevronRight className="w-4 h-4 hidden md:block" />
-                        </a>
+                        </Link>
                       </Button>
                       <Button
                         variant="ghost"

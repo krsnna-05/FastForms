@@ -1,10 +1,19 @@
-import FormBuilder from "@/components/dashboard/FormBuilder";
+import FormBuilder from "@/components/Form/FormBuilder";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
-const page = () => {
+interface PageProps {
+  params: Promise<{ formId: string }>;
+}
+
+const page = async ({ params }: PageProps) => {
+  const { formId } = await params;
+
   return (
-    <div className=" pt-18 w-full flex flex-1 ">
-      <FormBuilder />
-    </div>
+    <ProtectedRoute>
+      <div className="pt-20 w-full flex flex-1">
+        <FormBuilder formId={parseInt(formId)} />
+      </div>
+    </ProtectedRoute>
   );
 };
 
