@@ -1,7 +1,7 @@
 "use client";
 
 import { GripVertical, Trash2, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,24 +12,28 @@ import {
 } from "@hello-pangea/dnd";
 
 interface Option {
-  id: string;
+  id: number | string;
   value: string;
+  order?: number;
 }
 
 interface DropdownFieldProps {
   id: string;
   label: string;
   required?: boolean;
+  formId?: number;
   options?: Option[];
   onUpdate: (field: Partial<DropdownFieldProps>) => void;
   onDelete: (id: string) => void;
   dragHandleProps?: any;
+  isLoading?: boolean;
 }
 
 export const DropdownField = ({
   id,
   label,
   required = false,
+  formId,
   options = [
     { id: "1", value: "Option 1" },
     { id: "2", value: "Option 2" },
@@ -38,33 +42,112 @@ export const DropdownField = ({
   onUpdate,
   onDelete,
   dragHandleProps,
+  isLoading = false,
 }: DropdownFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(label);
   const [editOptions, setEditOptions] = useState<Option[]>(options);
 
   const handleSave = () => {
-    onUpdate({ label: editLabel, options: editOptions });
+    onUpdate({ label: editLabel });
     setIsEditing(false);
   };
 
-  const addOption = () => {
+  const addOption = useCallback(async () => {
+    if (!formId) return;
+
+    const newOrder = editOptions.length + 1;
     const newOption: Option = {
-      id: Date.now().toString(),
-      value: `Option ${editOptions.length + 1}`,
+      id: `temp-${Date.now()}`,
+      value: `Option ${newOrder}`,
+      order: newOrder,
     };
+
+    // Optimistic update
     setEditOptions([...editOptions, newOption]);
-  };
 
-  const updateOption = (id: string, value: string) => {
-    setEditOptions(
-      editOptions.map((opt) => (opt.id === id ? { ...opt, value } : opt)),
-    );
-  };
+    try {
+      const response = await fetch(
+        `/api/forms/${formId}/fields/${id}/options`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            value: newOption.value,
+            order: newOrder,
+          }),
+        },
+      );
 
-  const removeOption = (id: string) => {
-    setEditOptions(editOptions.filter((opt) => opt.id !== id));
-  };
+      if (response.ok) {
+        const createdOption = await response.json();
+        // Replace temp option with server option
+        setEditOptions((prev) =>
+          prev.map((opt) => (opt.id === newOption.id ? createdOption : opt)),
+        );
+      }
+    } catch (err) {
+      console.error("Error adding option:", err);
+      // Remove the option on error
+      setEditOptions((prev) => prev.filter((opt) => opt.id !== newOption.id));
+    }
+  }, [editOptions, id, formId]);
+
+  const updateOption = useCallback(
+    async (optionId: number | string, value: string) => {
+      // Optimistic update
+      setEditOptions(
+        editOptions.map((opt) =>
+          opt.id === optionId ? { ...opt, value } : opt,
+        ),
+      );
+
+      // Only make API call if it's a server option (numeric id)
+      if (typeof optionId === "number" && formId) {
+        try {
+          await fetch(`/api/forms/${formId}/fields/${id}/options/${optionId}`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ value }),
+          });
+        } catch (err) {
+          console.error("Error updating option:", err);
+        }
+      }
+    },
+    [editOptions, id, formId],
+  );
+
+  const removeOption = useCallback(
+    async (optionId: number | string) => {
+      // Optimistic update
+      setEditOptions((prev) => prev.filter((opt) => opt.id !== optionId));
+
+      // Only make API call if it's a server option (numeric id)
+      if (typeof optionId === "number" && formId) {
+        try {
+          await fetch(`/api/forms/${formId}/fields/${id}/options/${optionId}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+        } catch (err) {
+          console.error("Error deleting option:", err);
+          // Restore option on error
+          const option = options?.find((opt) => opt.id === optionId);
+          if (option) {
+            setEditOptions((prev) => [...prev, option]);
+          }
+        }
+      }
+    },
+    [id, formId, options],
+  );
 
   const handleDragEndOptions = (result: DropResult) => {
     const { source, destination } = result;
@@ -93,7 +176,8 @@ export const DropdownField = ({
           variant="ghost"
           size="sm"
           onClick={() => onDelete(id)}
-          className="p-1 h-auto hover:bg-destructive/10"
+          className="p-1 h-auto hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading}
         >
           <Trash2 className="w-4 h-4 text-destructive" />
         </Button>

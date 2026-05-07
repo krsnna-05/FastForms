@@ -32,7 +32,7 @@ model Form {
   title       String
   description String?
   creatorId   Int
-  creator     User     @relation(fields: [creatorId], references: [id])
+  creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
   fields      Field[]
 
@@ -48,7 +48,7 @@ model Form {
 model Field {
   id        Int      @id @default(autoincrement())
   formId    Int
-  form      Form     @relation(fields: [formId], references: [id])
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   label     String
   type      Type
@@ -69,7 +69,7 @@ model Field {
 model Option {
   id        Int      @id @default(autoincrement())
   fieldId   Int
-  field     Field    @relation(fields: [fieldId], references: [id])
+  field     Field    @relation(fields: [fieldId], references: [id], onDelete: Cascade)
 
   value     String
   order     Int

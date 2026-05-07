@@ -65,7 +65,10 @@ export const createFormWithFields = async (
             order: field.order,
             options: field.options
               ? {
-                  create: field.options,
+                  create: field.options.map((opt) => ({
+                    value: opt.value,
+                    order: opt.order,
+                  })),
                 }
               : undefined,
           })),
@@ -91,25 +94,70 @@ export const createFormWithFields = async (
   }
 };
 
-export const deleteFormById = async (formId: number) => {
+export const updateFormWithFields = async (
+  formId: number,
+  title: string,
+  description: string | null,
+  fields: Array<{
+    label: string;
+    type: string;
+    required: boolean;
+    order: number;
+    options?: Array<{ value: string; order: number }>;
+  }>,
+) => {
   try {
-    // Delete options first (if cascade delete is not set up)
-    await prisma.option.deleteMany({
-      where: {
-        field: {
-          formId,
+    // Delete existing fields (options cascade delete automatically via Field->Option onDelete: Cascade)
+    await prisma.field.deleteMany({
+      where: { formId },
+    });
+
+    // Update form and create new fields
+    const form = await prisma.form.update({
+      where: { id: formId },
+      data: {
+        title,
+        description,
+        fields: {
+          create: fields.map((field) => ({
+            label: field.label,
+            type: field.type as any,
+            required: field.required,
+            order: field.order,
+            options: field.options
+              ? {
+                  create: field.options.map((opt) => ({
+                    value: opt.value,
+                    order: opt.order,
+                  })),
+                }
+              : undefined,
+          })),
+        },
+      },
+      include: {
+        fields: {
+          include: {
+            options: true,
+          },
+          orderBy: {
+            order: "asc",
+          },
         },
       },
     });
 
-    // Delete fields
-    await prisma.field.deleteMany({
-      where: {
-        formId,
-      },
-    });
+    return form;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("updateFormWithFields error:", error);
+    return null;
+  }
+};
 
-    // Delete form
+export const deleteFormById = async (formId: number) => {
+  try {
+    // Delete form (fields and options cascade delete automatically via database constraints)
     const form = await prisma.form.delete({
       where: { id: formId },
     });
@@ -118,6 +166,39 @@ export const deleteFormById = async (formId: number) => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("deleteFormById error:", error);
+    return null;
+  }
+};
+
+export const updateFormMetadata = async (
+  formId: number,
+  title?: string,
+  description?: string | null,
+) => {
+  try {
+    const updateData: any = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+
+    const form = await prisma.form.update({
+      where: { id: formId },
+      data: updateData,
+      include: {
+        fields: {
+          include: {
+            options: true,
+          },
+          orderBy: {
+            order: "asc",
+          },
+        },
+      },
+    });
+
+    return form;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("updateFormMetadata error:", error);
     return null;
   }
 };

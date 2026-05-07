@@ -13,6 +13,7 @@ interface ParagraphFieldProps {
   onUpdate: (field: Partial<ParagraphFieldProps>) => void;
   onDelete: (id: string) => void;
   dragHandleProps?: any;
+  isLoading?: boolean;
 }
 
 export const ParagraphField = ({
@@ -22,6 +23,7 @@ export const ParagraphField = ({
   onUpdate,
   onDelete,
   dragHandleProps,
+  isLoading = false,
 }: ParagraphFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(label);
@@ -45,7 +47,8 @@ export const ParagraphField = ({
           variant="ghost"
           size="sm"
           onClick={() => onDelete(id)}
-          className="p-1 h-auto hover:bg-destructive/10"
+          className="p-1 h-auto hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading}
         >
           <Trash2 className="w-4 h-4 text-destructive" />
         </Button>

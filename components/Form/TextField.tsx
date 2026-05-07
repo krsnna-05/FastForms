@@ -12,6 +12,7 @@ interface TextFieldProps {
   onUpdate: (field: Partial<TextFieldProps>) => void;
   onDelete: (id: string) => void;
   dragHandleProps?: any;
+  isLoading?: boolean;
 }
 
 export const TextField = ({
@@ -21,6 +22,7 @@ export const TextField = ({
   onUpdate,
   onDelete,
   dragHandleProps,
+  isLoading = false,
 }: TextFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(label);
@@ -44,7 +46,8 @@ export const TextField = ({
           variant="ghost"
           size="sm"
           onClick={() => onDelete(id)}
-          className="p-1 h-auto hover:bg-destructive/10"
+          className="p-1 h-auto hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading}
         >
           <Trash2 className="w-4 h-4 text-destructive" />
         </Button>

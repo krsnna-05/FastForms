@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, ChevronRight } from "lucide-react";
+import { Plus, Trash2, ChevronRight, AlertCircle } from "lucide-react";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ERROR_MESSAGES, type ErrorCode } from "@/lib/errorCodes";
 import Link from "next/link";
 
 interface Form {
@@ -15,13 +16,22 @@ interface Form {
   updatedAt?: string;
 }
 
+interface ApiError {
+  code: ErrorCode;
+  message: string;
+}
+
 const DashBoard = () => {
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ApiError | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
+  const [creatingForm, setCreatingForm] = useState(false);
 
   useEffect(() => {
     const fetchForms = async () => {
       try {
+        setError(null);
         const response = await fetch("/api/forms", {
           method: "GET",
           credentials: "include",
@@ -31,10 +41,21 @@ const DashBoard = () => {
           const data = await response.json();
           setForms(data);
         } else {
+          const errorData = await response.json();
+          setError(
+            errorData.error || {
+              code: "INTERNAL_ERROR",
+              message: "Failed to fetch forms",
+            },
+          );
           setForms([]);
         }
       } catch (error) {
         console.error("Error fetching forms:", error);
+        setError({
+          code: "INTERNAL_ERROR" as ErrorCode,
+          message: "Failed to fetch forms",
+        });
         setForms([]);
       } finally {
         setLoading(false);
@@ -46,6 +67,8 @@ const DashBoard = () => {
 
   const handleCreateForm = async () => {
     try {
+      setCreatingForm(true);
+      setError(null);
       const response = await fetch("/api/forms", {
         method: "POST",
         credentials: "include",
@@ -55,15 +78,29 @@ const DashBoard = () => {
         const newForm = await response.json();
         setForms([newForm, ...forms]);
       } else {
-        console.error("Failed to create form");
+        const errorData = await response.json();
+        setError(
+          errorData.error || {
+            code: "FORM_CREATE_FAILED" as ErrorCode,
+            message: ERROR_MESSAGES.FORM_CREATE_FAILED,
+          },
+        );
       }
     } catch (error) {
       console.error("Error creating form:", error);
+      setError({
+        code: "INTERNAL_ERROR" as ErrorCode,
+        message: "Error creating form",
+      });
+    } finally {
+      setCreatingForm(false);
     }
   };
 
   const handleDeleteForm = async (id: string | number) => {
     try {
+      setDeletingId(id);
+      setError(null);
       const response = await fetch(`/api/forms?id=${id}`, {
         method: "DELETE",
         credentials: "include",
@@ -72,10 +109,22 @@ const DashBoard = () => {
       if (response.ok) {
         setForms(forms.filter((f) => f.id !== id));
       } else {
-        console.error("Failed to delete form");
+        const errorData = await response.json();
+        setError(
+          errorData.error || {
+            code: "FORM_DELETE_FAILED" as ErrorCode,
+            message: ERROR_MESSAGES.FORM_DELETE_FAILED,
+          },
+        );
       }
     } catch (error) {
       console.error("Error deleting form:", error);
+      setError({
+        code: "INTERNAL_ERROR" as ErrorCode,
+        message: "Error deleting form",
+      });
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -103,6 +152,17 @@ const DashBoard = () => {
     <ProtectedRoute>
       <div className="pt-24 pb-12 px-4 md:px-8 min-h-screen bg-background to-muted/30">
         <div className="max-w-7xl mx-auto">
+          {/* Error Alert */}
+          {error && (
+            <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-destructive">Error</h3>
+                <p className="text-sm text-destructive/80">{error.message}</p>
+              </div>
+            </div>
+          )}
+
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
@@ -117,9 +177,10 @@ const DashBoard = () => {
               onClick={handleCreateForm}
               className="w-full md:w-auto gap-2"
               size="lg"
+              disabled={creatingForm}
             >
               <Plus className="w-4 h-4" />
-              Create New Form
+              {creatingForm ? "Creating..." : "Create New Form"}
             </Button>
           </div>
 
@@ -134,7 +195,9 @@ const DashBoard = () => {
                 Get started by creating your first form. You can use AI to help
                 you build it faster.
               </p>
-              <Button onClick={handleCreateForm}>Create Your First Form</Button>
+              <Button onClick={handleCreateForm} disabled={creatingForm}>
+                {creatingForm ? "Creating..." : "Create Your First Form"}
+              </Button>
             </div>
           ) : (
             <div className="border border-border rounded-lg overflow-hidden">
@@ -201,6 +264,7 @@ const DashBoard = () => {
                         size="icon"
                         className="w-8 h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={() => handleDeleteForm(form.id)}
+                        disabled={deletingId === form.id}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
